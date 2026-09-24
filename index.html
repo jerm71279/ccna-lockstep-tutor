@@ -1,0 +1,2173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>CCNA Lockstep Tutor</title>
+  <meta name="theme-color" content="#0b1220" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect fill='%23049fd9' width='64' height='64' rx='12'/><text x='32' y='42' text-anchor='middle' font-size='28' fill='white' font-family='sans-serif'>C</text></svg>" />
+  <style>
+    :root {
+      --bg: #071018; --bg2: #0d1824; --panel: #101c2b; --panel2: #152536;
+      --line: #22364a; --text: #e8f1f8; --muted: #8aa3b8; --accent: #049fd9;
+      --accent2: #00c2a8; --warn: #f0b429; --bad: #ef6b6b; --good: #3dd68c;
+      --shadow: 0 10px 30px rgba(0,0,0,.35); --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: "Segoe UI", Inter, system-ui, sans-serif; }
+    body { min-height: 100vh; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    header.app {
+      position: sticky; top: 0; z-index: 40;
+      background: linear-gradient(180deg, rgba(7,16,24,.96), rgba(7,16,24,.86));
+      backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); padding: 14px 20px;
+    }
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 0 16px 48px; }
+    .wrap.wide { max-width: 1440px; }
+    .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .brand { display: flex; gap: 12px; align-items: center; }
+    .logo {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: linear-gradient(135deg, #049fd9, #0076a8);
+      display: grid; place-items: center; font-weight: 800;
+      box-shadow: 0 0 0 4px rgba(4,159,217,.15);
+    }
+    h1 { font-size: 18px; margin: 0; }
+    h1 span { display: block; font-size: 12px; color: var(--muted); font-weight: 500; }
+    nav.tabs { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+    .tab {
+      border: 1px solid var(--line); background: var(--panel); color: var(--text);
+      padding: 8px 12px; border-radius: 999px; cursor: pointer; font-size: 13px;
+    }
+    .tab.active { background: var(--accent); border-color: var(--accent); color: #041018; font-weight: 700; }
+    .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 18px 0; }
+    @media (max-width: 980px) { .cards { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 640px) { .cards { grid-template-columns: 1fr; } nav.tabs { width: 100%; } }
+    .card {
+      background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 16px; box-shadow: var(--shadow);
+    }
+    .card h3 { margin: 0 0 6px; font-size: 13px; color: var(--muted); font-weight: 600; letter-spacing: .3px; text-transform: uppercase; }
+    .stat { font-size: 28px; font-weight: 800; }
+    .stat small { font-size: 14px; color: var(--muted); font-weight: 600; }
+    .bar { height: 8px; background: #1b2d3d; border-radius: 99px; overflow: hidden; margin-top: 10px; }
+    .bar > i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); width: 0%; }
+    .phase-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    @media (max-width: 900px) { .phase-grid { grid-template-columns: 1fr; } }
+    .phase { border-left: 4px solid var(--accent); }
+    .phase.p2 { border-left-color: var(--accent2); }
+    .phase.p3 { border-left-color: var(--warn); }
+    .tiny { font-size: 12px; color: var(--muted); }
+    .btn { border: 0; border-radius: 10px; padding: 9px 12px; cursor: pointer; font-weight: 650; background: var(--accent); color: #041018; }
+    .btn.ghost { background: transparent; color: var(--text); border: 1px solid var(--line); }
+    .btn.bad { background: #3a1d22; color: #ffd6d6; border: 1px solid #5a2a32; }
+    .btn.good { background: var(--good); color: #062014; }
+    input, select, textarea {
+      background: #0b1622; color: var(--text); border: 1px solid var(--line);
+      border-radius: 10px; padding: 9px 11px; width: 100%; font: inherit;
+    }
+    textarea { min-height: 72px; resize: vertical; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { font-size: 12px; color: var(--muted); text-transform: uppercase; }
+    .pill { display: inline-block; font-size: 11px; padding: 3px 8px; border-radius: 999px; background: #1b2d3d; color: #cfe4f3; }
+    .pill.done { background: rgba(61,214,140,.15); color: var(--good); }
+    .pill.open { background: rgba(240,180,41,.12); color: var(--warn); }
+    .checks { display: flex; gap: 10px; flex-wrap: wrap; }
+    .chk { display: flex; gap: 6px; align-items: center; font-size: 13px; }
+    .chk input { width: auto; accent-color: var(--accent); }
+    .day { background: var(--panel2); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 10px; }
+    .day.complete { border-color: rgba(61,214,140,.35); }
+    .day h4 { margin: 0; font-size: 15px; }
+    .hidden { display: none !important; }
+    .split { display: grid; grid-template-columns: 1.6fr .9fr; gap: 16px; }
+    @media (max-width: 980px) { .split { grid-template-columns: 1fr; } }
+    ul.clean { margin: 8px 0 0; padding-left: 18px; }
+    ul.clean li { margin: 6px 0; }
+    .score-row { display: grid; grid-template-columns: 90px 1fr 90px 90px auto; gap: 8px; align-items: end; }
+    @media (max-width: 720px) { .score-row { grid-template-columns: 1fr 1fr; } }
+    footer { color: var(--muted); font-size: 12px; margin-top: 28px; }
+    .toast { position: fixed; bottom: 18px; right: 18px; background: #123; color: #fff; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--line); display: none; z-index: 80; }
+
+    /* CLI */
+    .cli-layout { display: grid; grid-template-columns: 1fr 340px; gap: 14px; margin-top: 16px; }
+    @media (max-width: 980px) { .cli-layout { grid-template-columns: 1fr; } }
+    .term {
+      background: #020805; border: 1px solid #163; border-radius: 14px; min-height: 560px;
+      display: flex; flex-direction: column; overflow: hidden; font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+    }
+    .term-bar {
+      background: #0a1a12; border-bottom: 1px solid #1a3; padding: 8px 12px;
+      display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .term-bar strong { color: #7dffb3; font-size: 13px; }
+    .term-out {
+      flex: 1; overflow-y: auto; padding: 12px; color: #c8f7d4; font-size: 13px; line-height: 1.45;
+      white-space: pre-wrap; word-break: break-word;
+    }
+    .term-out .cmd { color: #eafff2; }
+    .term-out .err { color: #ff9a9a; }
+    .term-out .ok { color: #8dffc0; }
+    .term-in {
+      display: flex; align-items: center; gap: 6px; padding: 8px 12px; border-top: 1px solid #1a3; background: #03110a;
+    }
+    .term-in .ps1 { color: #7dffb3; white-space: nowrap; font-size: 13px; }
+    .term-in input {
+      background: transparent; border: 0; outline: none; color: #eafff2; padding: 4px 0; border-radius: 0;
+      font-family: inherit; font-size: 13px;
+    }
+    .topo { font-family: ui-monospace, Consolas, monospace; font-size: 12px; background: #0b1622; padding: 10px; border-radius: 10px; overflow-x: auto; color: #b7e0c8; }
+    .lab-obj li { margin: 6px 0; }
+    .lab-obj .hit { color: var(--good); text-decoration: line-through; }
+    .dev-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+    .dev-btns .btn { padding: 6px 10px; font-size: 12px; }
+    .dev-btns .btn.on { outline: 2px solid var(--good); }
+
+    :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); color-scheme: dark; }
+    html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+    header.app { top: env(safe-area-inset-top, 0px); }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+    @media (max-width: 640px) {
+      nav.tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+      nav.tabs::-webkit-scrollbar { display: none; }
+      .tab { flex: none; }
+      header.app { padding: 10px 12px; }
+      .wrap { padding: 0 10px 40px; }
+    }
+    .tab.tutor-tab { border-color: var(--accent2); }
+    .tab.tutor-tab.active { background: var(--accent2); border-color: var(--accent2); }
+    /* tutor */
+    .tutor-layout { display: grid; grid-template-columns: 1fr 340px; gap: 14px; margin-top: 16px; }
+    @media (max-width: 980px) { .tutor-layout { grid-template-columns: 1fr; } .tutor-layout .side { order: 2; } }
+    .chat { display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+    .chat-head { padding: 12px 14px; border-bottom: 1px solid var(--line); justify-content: space-between; }
+    .chat-head h3 { margin: 0; }
+    .chat-head select { width: auto; padding: 6px 8px; font-size: 13px; }
+    .chat-log { height: min(60vh, 560px); overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .msg { max-width: 92%; padding: 10px 13px; border-radius: 14px; font-size: 14.5px; line-height: 1.55; overflow-wrap: anywhere; }
+    .msg p { margin: 0 0 8px; } .msg p:last-child { margin-bottom: 0; }
+    .msg ul, .msg ol { margin: 4px 0 8px; padding-left: 20px; } .msg li { margin: 3px 0; }
+    .msg.user { align-self: flex-end; background: #0e3a52; border: 1px solid #1a5877; }
+    .msg.assistant { align-self: flex-start; background: var(--panel2); border: 1px solid var(--line); }
+    .msg code { background: #0a1520; border: 1px solid var(--line); border-radius: 5px; padding: 0 4px; font-size: 13px; font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
+    .md-code { background: #020805; color: #c8f7d4; border: 1px solid #163; border-radius: 10px; padding: 10px 12px; font: 12.5px/1.5 ui-monospace, "Cascadia Code", Consolas, monospace; overflow-x: auto; white-space: pre; margin: 6px 0 8px; }
+    .md-h { font-weight: 700; color: #cfe9fb; }
+    .thinking { color: var(--muted); animation: pulse 1.4s ease-in-out infinite; }
+    @keyframes pulse { 50% { opacity: .45; } }
+    @media (prefers-reduced-motion: reduce) { .thinking { animation: none; } }
+    .empty { color: var(--muted); font-size: 14px; margin: auto; text-align: center; max-width: 380px; }
+    .chips { display: flex; gap: 6px; padding: 8px 14px 0; overflow-x: auto; scrollbar-width: none; }
+    .chip { flex: none; border: 1px solid var(--line); background: #0b1622; color: var(--text); border-radius: 999px; padding: 7px 11px; font-size: 12.5px; cursor: pointer; }
+    .chip:disabled, .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .chat-in { display: flex; gap: 8px; padding: 10px 14px 12px; align-items: flex-end; }
+    .chat-in textarea { min-height: 44px; max-height: 140px; font-size: 15px; }
+    .chat-in .btn { flex: none; height: 44px; }
+    .chat .tiny[data-ai-status] { padding: 0 14px 10px; margin: 0; }
+    .side p { font-size: 14px; line-height: 1.5; }
+    .trap { border-left: 3px solid var(--warn); padding-left: 10px; color: #f6dca0; }
+    .links { display: flex; flex-wrap: wrap; gap: 10px; font-size: 13px; }
+    /* mastery */
+    .m-row { margin: 10px 0; }
+    .m-lab { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; flex-wrap: wrap; }
+    .m-w { margin-left: 8px; opacity: .7; }
+    .m-row .bar { margin-top: 5px; }
+    /* quiz */
+    .q-text { font-size: 17px; line-height: 1.5; margin: 8px 0 14px; }
+    .opts { display: grid; gap: 8px; }
+    .opt { text-align: left; display: flex; gap: 10px; align-items: flex-start; background: #0b1622; color: var(--text); border: 1px solid var(--line); border-radius: 12px; padding: 12px; font: inherit; font-size: 15px; cursor: pointer; }
+    .opt .k { flex: none; width: 24px; height: 24px; display: grid; place-items: center; border-radius: 7px; background: var(--panel2); font-weight: 700; font-size: 12px; }
+    .opt:hover:not(:disabled) { border-color: var(--accent); }
+    .opt.right { border-color: var(--good); background: rgba(61,214,140,.1); }
+    .opt.right .k { background: var(--good); color: #062014; }
+    .opt.wrong { border-color: var(--bad); background: rgba(239,107,107,.1); }
+    .opt:disabled { cursor: default; }
+    #q-after { margin-top: 14px; font-size: 14.5px; line-height: 1.55; }
+    .ok-t { color: var(--good); font-weight: 700; } .bad-t { color: var(--bad); font-weight: 700; }
+    /* subnet */
+    .sn-q { display: flex; flex-direction: column; gap: 2px; margin: 16px 0; }
+    .sn-q .big { font: 700 28px/1.2 ui-monospace, "Cascadia Code", Consolas, monospace; color: #7dffb3; letter-spacing: .5px; }
+    #sn-fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-bottom: 12px; }
+    #sn-fields input { font-family: ui-monospace, Consolas, monospace; font-size: 16px; }
+    .in-ok { border-color: var(--good) !important; } .in-bad { border-color: var(--bad) !important; }
+    #sn-out { margin-top: 12px; font-size: 14.5px; line-height: 1.55; }
+    .sn-stat { display: flex; align-items: baseline; gap: 8px; margin: 8px 0; } .sn-stat b { font-size: 26px; }
+    .day-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
+    .day-actions .btn { padding: 6px 10px; font-size: 12.5px; }
+    .day-actions a { font-size: 12.5px; }
+    .pass-box { padding: 0 14px 14px; }
+    .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
+    @media (max-width: 720px) { .pass-box { padding: 0 14px 14px; }
+    .res-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header class="app">
+    <div class="wrap wide row">
+      <div class="brand">
+        <div class="logo">C</div>
+        <h1>CCNA Lockstep Tutor<span>Jeremy’s IT Lab + Boson + IOS CLI Lab · 200-301 v1.1</span></h1>
+      </div>
+      <nav class="tabs">
+        <button class="tab active" data-view="dashboard">Dashboard</button>
+        <button class="tab tutor-tab" data-view="tutor">Tutor</button>
+        <button class="tab" data-view="quiz">Quiz</button>
+        <button class="tab" data-view="subnet">Subnetting</button>
+        <button class="tab" data-view="plan">Study Days</button>
+        <button class="tab" data-view="cli">CLI Lab</button>
+        <button class="tab" data-view="boson">Boson Tracker</button>
+        <button class="tab" data-view="resources">Resources</button>
+        <button class="tab" data-view="settings">Backup</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap wide">
+    <section id="view-dashboard">
+      <div class="cards">
+        <div class="card">
+          <h3>Course progress</h3>
+          <div class="stat" id="stat-days">0<small>/63 days</small></div>
+          <div class="bar"><i id="bar-days"></i></div>
+          <p class="tiny" id="stat-tasks">0 of 0 tasks complete</p>
+        </div>
+        <div class="card">
+          <h3>Boson readiness</h3>
+          <div class="stat" id="stat-boson">—<small> best sim</small></div>
+          <div class="bar"><i id="bar-boson"></i></div>
+          <p class="tiny">Target 85%+ in Simulation mode before booking</p>
+        </div>
+        <div class="card">
+          <h3>Current phase</h3>
+          <div class="stat" id="stat-phase" style="font-size:22px">Phase 1</div>
+          <p class="tiny" id="stat-phase-note">Foundations + diagnostic Exam A</p>
+        </div>
+        <div class="card">
+          <h3>Streak / last study</h3>
+          <div class="stat" id="stat-streak">0<small> days</small></div>
+          <p class="tiny" id="stat-last">No activity logged yet</p>
+        </div>
+      </div>
+      <div class="phase-grid">
+        <div class="card phase">
+          <h3>Phase 1 · Foundations</h3>
+          <p><strong>Days 1–10</strong> plus first Boson diagnostic.</p>
+          <ul class="clean">
+            <li>Watch lecture + Packet Tracer + Anki</li>
+            <li>Practice the same commands in <b>CLI Lab</b></li>
+            <li>After Day 4–5, take Boson Exam A in Simulation mode</li>
+          </ul>
+          <p class="tiny" id="p1-status"></p>
+        </div>
+        <div class="card phase p2">
+          <h3>Phase 2 · Core lockstep</h3>
+          <ul class="clean">
+            <li><b>Days 11–23</b> Access / STP / EtherChannel → Boson + VLAN lab</li>
+            <li><b>Days 24–33</b> Routing / OSPF / IPv6 → static & OSPF labs</li>
+            <li><b>Days 34–47</b> Services / ACL / NAT → ACL lab</li>
+            <li><b>Days 48–63</b> Security / wireless / automation</li>
+          </ul>
+        </div>
+        <div class="card phase p3">
+          <h3>Phase 3 · Exam polish</h3>
+          <ul class="clean">
+            <li>Mega Lab + weak-day reviews</li>
+            <li>Full Boson Simulation rotation</li>
+            <li>Book when you hold 85–90%+ on Exams C/D</li>
+          </ul>
+        </div>
+      </div>
+      <div class="split" style="margin-top:16px">
+        <div class="card">
+          <h3>Next up</h3>
+          <div id="next-up"></div>
+        </div>
+        <div class="card">
+          <h3>Today’s lockstep checklist</h3>
+          <label class="chk"><input type="checkbox"> Watch JITL lecture(s)</label><br>
+          <label class="chk"><input type="checkbox"> Complete Packet Tracer lab</label><br>
+          <label class="chk"><input type="checkbox"> Practice same configs in CLI Lab</label><br>
+          <label class="chk"><input type="checkbox"> Review Anki deck</label><br>
+          <label class="chk"><input type="checkbox"> Log or review Boson questions</label>
+        </div>
+      </div>
+          <div class="split" style="margin-top:16px">
+        <div class="card"><h3>Mastery by exam domain</h3><div id="mastery-d"></div></div>
+        <div class="card"><h3>Today’s focus</h3><div id="focus-list"></div></div>
+      </div>
+</section>
+
+    <section id="view-tutor" class="hidden">
+      <div class="tutor-layout">
+        <div class="card chat">
+          <div class="chat-head row">
+            <h3>CCNA tutor</h3>
+            <div class="row" style="gap:6px">
+              <select id="tutor-mode" aria-label="Tutor style"><option value="teach">Teach</option><option value="socratic">Socratic</option><option value="coach">Exam coach</option></select>
+              <button class="btn ghost" id="tutor-new">New chat</button>
+            </div>
+          </div>
+          <div id="chat-log" class="chat-log" aria-live="polite"></div>
+          <div id="chip-row" class="chips"></div>
+          <div class="chat-in">
+            <textarea id="chat-box" rows="1" placeholder="Ask about any 200-301 topic…" data-ai></textarea>
+            <button class="btn" id="chat-send" data-ai>Ask</button>
+            <button class="btn ghost hidden" id="chat-stop">Stop</button>
+          </div>
+          <p class="tiny" data-ai-status></p>
+          <div id="pass-box" class="hidden pass-box">
+            <label class="tiny" for="pass-in">Tutor passcode</label>
+            <div class="row"><input id="pass-in" type="password" autocomplete="current-password" style="max-width:260px"><button class="btn" id="pass-save">Unlock</button></div>
+          </div>
+        </div>
+        <div class="card side">
+          <h3>Syllabus</h3>
+          <select id="tutor-day" aria-label="Focus day"></select>
+          <div id="tutor-ctx" style="margin-top:10px"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-quiz" class="hidden">
+      <div class="split" style="margin-top:18px">
+        <div class="card">
+          <div class="row">
+            <select id="quiz-scope" aria-label="Question scope" style="max-width:320px"></select>
+            <button class="btn" id="quiz-next">Next question</button>
+            <button class="btn ghost" id="quiz-gen" data-ai>Generate 5 with AI</button>
+          </div>
+          <p class="tiny" data-ai-status></p>
+          <div id="quiz-card" style="margin-top:12px"></div>
+        </div>
+        <div class="card"><h3>Mastery by exam domain</h3><div id="mastery-q"></div><p class="tiny" id="quiz-bank-info"></p></div>
+      </div>
+    </section>
+
+    <section id="view-subnet" class="hidden">
+      <div class="split" style="margin-top:18px">
+        <div class="card">
+          <div class="row">
+            <select id="sn-mode" aria-label="Drill type" style="max-width:280px">
+              <option value="host">Host → network, broadcast, range</option>
+              <option value="wild">Mask ↔ wildcard</option>
+              <option value="fit">Smallest prefix for N hosts</option>
+            </select>
+            <button class="btn ghost" id="sn-new">New problem</button>
+          </div>
+          <div id="sn-q" class="sn-q"></div>
+          <div id="sn-fields"></div>
+          <div class="row"><button class="btn good" id="sn-check">Check</button><button class="btn ghost" id="sn-show">Show work</button></div>
+          <div id="sn-out"></div>
+        </div>
+        <div class="card"><h3>Drill stats</h3><div id="sn-stats"></div></div>
+      </div>
+    </section>
+
+
+    <section id="view-plan" class="hidden">
+      <div class="card" style="margin:18px 0 14px">
+        <div class="row">
+          <input id="search" placeholder="Search days (VLAN, OSPF, JSON, wireless…)" style="max-width:420px">
+          <select id="filter-block" style="max-width:260px">
+            <option value="all">All blocks</option>
+            <option value="p1">Phase 1 · Days 1–10</option>
+            <option value="b1">Access / STP · 11–23</option>
+            <option value="b2">Routing / IPv6 · 24–33</option>
+            <option value="b3">Services · 34–47</option>
+            <option value="b4">Security / Wireless · 48–58</option>
+            <option value="b5">Automation · 59–63</option>
+          </select>
+          <select id="filter-status" style="max-width:180px">
+            <option value="all">All statuses</option>
+            <option value="open">Incomplete</option>
+            <option value="done">Complete</option>
+          </select>
+        </div>
+      </div>
+      <div id="day-list"></div>
+    </section>
+
+    <section id="view-cli" class="hidden">
+      <div class="cli-layout">
+        <div>
+          <div class="term">
+            <div class="term-bar">
+              <strong id="term-title">SW1 console</strong>
+              <span class="tiny" id="term-mode">user EXEC</span>
+              <div class="row">
+                <button class="btn ghost" id="cli-clear">Clear</button>
+                <button class="btn ghost" id="cli-reset">Reset lab</button>
+                <button class="btn" id="cli-ask" data-ai>Ask tutor</button>
+              </div>
+            </div>
+            <div class="term-out" id="term-out"></div>
+            <div class="term-in">
+              <span class="ps1" id="ps1">SW1&gt;</span>
+              <input id="term-in" autocomplete="off" spellcheck="false" placeholder="type a Cisco IOS command, or ?" />
+            </div>
+          </div>
+          <p class="tiny" style="margin-top:8px">Teaching simulator — not Packet Tracer and not real IOS. Supports CCNA-style modes, interfaces, VLANs, static routes, OSPF, ACLs, NAT overload, ping, and show commands. Tab completes; Up/Down is history.</p>
+        </div>
+        <div>
+          <div class="card">
+            <h3>Console</h3>
+            <div class="dev-btns" id="dev-btns"></div>
+            <pre class="topo" id="topo"></pre>
+          </div>
+          <div class="card" style="margin-top:12px">
+            <h3>Practice lab</h3>
+            <select id="lab-select"></select>
+            <p class="tiny" id="lab-why" style="margin:8px 0"></p>
+            <ul class="clean lab-obj" id="lab-obj"></ul>
+            <button class="btn good" id="lab-check" style="margin-top:8px">Check objectives</button>
+          </div>
+          <div class="card" style="margin-top:12px">
+            <h3>Command hints</h3>
+            <p class="tiny">enable → configure terminal → interface g0/0 → ip address … → no shutdown → end → show ip interface brief</p>
+            <p class="tiny">Switch: vlan 10 → name SALES → int fa0/1 → switchport mode access → switchport access vlan 10</p>
+            <p class="tiny">Routing: ip route 10.0.2.0 255.255.255.0 10.0.12.2 &nbsp;|&nbsp; router ospf 1 → network 10.0.12.0 0.0.0.3 area 0</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-boson" class="hidden" style="margin-top:18px">
+      <div class="card">
+        <h3>Log a Boson attempt</h3>
+        <p class="tiny">Boson ExSim-Max for 200-301 · $99/year. Study mode while learning a block; Simulation mode for readiness.</p>
+        <div class="score-row" style="margin-top:10px">
+          <div><div class="tiny">Exam</div>
+            <select id="bx-exam"><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option></select>
+          </div>
+          <div><div class="tiny">Mode</div>
+            <select id="bx-mode"><option>Simulation</option><option>Study</option><option>Practice</option></select>
+          </div>
+          <div><div class="tiny">Score %</div><input id="bx-score" type="number" min="0" max="100" placeholder="72"></div>
+          <div><div class="tiny">Weak domain</div><input id="bx-weak" placeholder="OSPF, ACLs…"></div>
+          <button class="btn" id="bx-add">Add score</button>
+        </div>
+        <div style="margin-top:10px"><div class="tiny">Notes</div><textarea id="bx-notes"></textarea></div>
+      </div>
+      <div class="card" style="margin-top:14px"><h3>Score history</h3><div id="bx-table"></div></div>
+    </section>
+
+    <section id="view-resources" class="hidden">
+      <div class="res-grid" id="res-list"></div>
+    </section>
+
+    <section id="view-settings" class="hidden" style="margin-top:18px">
+      <div class="card">
+        <h3>Backup and sync</h3>
+        <p class="tiny" id="sync-status">Checking sync…</p>
+        <div class="row" style="margin-top:10px">
+          <button class="btn" id="btn-export">Export JSON</button>
+          <label class="btn ghost">Import JSON<input type="file" id="btn-import" accept="application/json" style="display:none"></label>
+          <button class="btn bad" id="btn-reset">Reset study progress</button>
+        </div>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <h3>Exam target</h3>
+        <div class="row">
+          <input id="exam-date" type="date" style="max-width:220px">
+          <button class="btn ghost" id="save-date">Save date</button>
+        </div>
+        <p class="tiny" id="exam-countdown"></p>
+      </div>
+    </section>
+    <footer>Unofficial personal planner. Not affiliated with Cisco, Boson, or Jeremy’s IT Lab. CLI Lab is a teaching emulator, not real IOS. The AI tutor can make mistakes — verify commands in Packet Tracer.</footer>
+  </main>
+  <div class="toast" id="toast"></div>
+
+<script>
+const DAYS = [
+  {n:1,title:"Network Devices",block:"p1",boson:"After Day 4–5 take Exam A (diagnostic)",links:{yt:"https://www.youtube.com/watch?v=H8W9oMNSuwo"}},
+  {n:2,title:"Interfaces and Cables",block:"p1",boson:"Keep building fundamentals",links:{yt:"https://www.youtube.com/watch?v=ieTH5lVhNaY"}},
+  {n:3,title:"TCP/IP Model & OSI",block:"p1",boson:"Keep building fundamentals",links:{yt:"https://www.youtube.com/watch?v=yM-XNq9ADlI"}},
+  {n:4,title:"Intro to the CLI",block:"p1",boson:"Practice enable / conf t in CLI Lab · Lab 1",links:{yt:"https://www.youtube.com/watch?v=IYbtai7Nu2g"}},
+  {n:5,title:"Ethernet LAN Switching (Part 1)",block:"p1",boson:"Finish Exam A review if not done",links:{yt:"https://www.youtube.com/watch?v=u2n762WG0Vo"}},
+  {n:6,title:"Ethernet LAN Switching (Part 2)",block:"p1",boson:"Review switching misses from Exam A",links:{yt:"https://www.youtube.com/watch?v=5q1pqdmdPjo"}},
+  {n:7,title:"IPv4 Addressing (Part 1)",block:"p1",boson:"Drill subnetting daily from here",links:{yt:"https://www.youtube.com/watch?v=3ROdsfEUuhs"}},
+  {n:8,title:"IPv4 Addressing (Part 2)",block:"p1",boson:"CLI Lab 2: put IPs on R1 and R2",links:{yt:"https://www.youtube.com/watch?v=FiAatRd84XI"}},
+  {n:9,title:"Switch Interfaces",block:"p1",boson:"no shutdown, description, show ip int br",links:{yt:"https://www.youtube.com/watch?v=cCqluocfQe0"}},
+  {n:10,title:"The IPv4 Header",block:"p1",boson:"End of Phase 1",links:{}},
+  {n:11,title:"Routing Fundamentals & Static Routing",block:"b1",boson:"CLI Lab 4: static routes PC1↔PC2",links:{yt:"https://www.youtube.com/watch?v=aHwAm8GYbn8"}},
+  {n:12,title:"Life of a Packet",block:"b1",boson:"",links:{}},
+  {n:13,title:"Subnetting (Part 1)",block:"b1",boson:"",links:{}},
+  {n:14,title:"Subnetting (Part 2)",block:"b1",boson:"",links:{}},
+  {n:15,title:"Subnetting / VLSM (Part 3)",block:"b1",boson:"",links:{}},
+  {n:16,title:"VLANs (Part 1)",block:"b1",boson:"CLI Lab 3",links:{}},
+  {n:17,title:"VLANs (Part 2)",block:"b1",boson:"CLI Lab 3",links:{}},
+  {n:18,title:"VLANs (Part 3)",block:"b1",boson:"",links:{}},
+  {n:19,title:"DTP / VTP",block:"b1",boson:"",links:{}},
+  {n:20,title:"Spanning Tree Protocol (Part 1)",block:"b1",boson:"",links:{}},
+  {n:21,title:"STP Toolkit",block:"b1",boson:"",links:{}},
+  {n:22,title:"Rapid Spanning Tree Protocol",block:"b1",boson:"",links:{}},
+  {n:23,title:"EtherChannel",block:"b1",boson:"Boson checkpoint: Exam B",links:{}},
+  {n:24,title:"Dynamic Routing",block:"b2",boson:"",links:{}},
+  {n:25,title:"RIP / EIGRP (awareness)",block:"b2",boson:"",links:{}},
+  {n:26,title:"OSPF (Part 1)",block:"b2",boson:"CLI Lab 5",links:{}},
+  {n:27,title:"OSPF (Part 2)",block:"b2",boson:"CLI Lab 5",links:{}},
+  {n:28,title:"OSPF (Part 3)",block:"b2",boson:"",links:{}},
+  {n:29,title:"First Hop Redundancy Protocols",block:"b2",boson:"",links:{}},
+  {n:30,title:"TCP and UDP",block:"b2",boson:"",links:{}},
+  {n:31,title:"IPv6 (Part 1)",block:"b2",boson:"",links:{}},
+  {n:32,title:"IPv6 (Part 2)",block:"b2",boson:"",links:{}},
+  {n:33,title:"IPv6 (Part 3)",block:"b2",boson:"Boson checkpoint after IPv6",links:{}},
+  {n:34,title:"Standard ACLs",block:"b3",boson:"CLI Lab 6",links:{}},
+  {n:35,title:"Extended ACLs",block:"b3",boson:"CLI Lab 6",links:{}},
+  {n:36,title:"CDP and LLDP",block:"b3",boson:"show cdp neighbors",links:{}},
+  {n:37,title:"NTP",block:"b3",boson:"",links:{}},
+  {n:38,title:"DNS",block:"b3",boson:"",links:{}},
+  {n:39,title:"DHCP",block:"b3",boson:"",links:{}},
+  {n:40,title:"SNMP",block:"b3",boson:"",links:{}},
+  {n:41,title:"Syslog",block:"b3",boson:"",links:{}},
+  {n:42,title:"SSH",block:"b3",boson:"",links:{}},
+  {n:43,title:"FTP and TFTP",block:"b3",boson:"",links:{}},
+  {n:44,title:"NAT Static (Part 1)",block:"b3",boson:"CLI Lab 7",links:{}},
+  {n:45,title:"NAT Dynamic (Part 2)",block:"b3",boson:"CLI Lab 7",links:{}},
+  {n:46,title:"QoS / Voice VLAN (Part 1)",block:"b3",boson:"",links:{}},
+  {n:47,title:"QoS (Part 2)",block:"b3",boson:"Boson checkpoint after services",links:{}},
+  {n:48,title:"Security Fundamentals",block:"b4",boson:"",links:{}},
+  {n:49,title:"Port Security",block:"b4",boson:"",links:{}},
+  {n:50,title:"DHCP Snooping",block:"b4",boson:"",links:{}},
+  {n:51,title:"Dynamic ARP Inspection",block:"b4",boson:"",links:{}},
+  {n:52,title:"LAN Architectures",block:"b4",boson:"",links:{}},
+  {n:53,title:"WAN Architectures",block:"b4",boson:"",links:{}},
+  {n:54,title:"Virtualization, Cloud, Containers, VRF",block:"b4",boson:"",links:{}},
+  {n:55,title:"Wireless Fundamentals",block:"b4",boson:"",links:{}},
+  {n:56,title:"Wireless Architectures",block:"b4",boson:"",links:{}},
+  {n:57,title:"Wireless Security",block:"b4",boson:"",links:{}},
+  {n:58,title:"Wireless Configuration",block:"b4",boson:"Boson checkpoint",links:{}},
+  {n:59,title:"Intro to Network Automation",block:"b5",boson:"Conceptual — Python is not coded on the exam",links:{yt:"https://www.youtube.com/watch?v=4tsBgMCPVuc"}},
+  {n:60,title:"JSON, XML & YAML",block:"b5",boson:"Read JSON",links:{yt:"https://www.youtube.com/watch?v=nohde2-QNJ4"}},
+  {n:61,title:"REST APIs",block:"b5",boson:"",links:{yt:"https://www.youtube.com/watch?v=Luei0p-2h10"}},
+  {n:62,title:"Software Defined Networking",block:"b5",boson:"",links:{}},
+  {n:63,title:"Ansible, Puppet & Chef + Mega Lab review",block:"b5",boson:"Book when Boson Simulation is 85%+",links:{}}
+];
+
+const KEY = "ccna-lockstep-v1";
+const defaultState = () => ({
+  days: Object.fromEntries(DAYS.map(d => [d.n, {lecture:false, lab:false, anki:false, notes:false, memo:""}])),
+  boson: [], examDate: "", lastStudy: null, streak: 0
+});
+function load() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return defaultState();
+    const s = JSON.parse(raw);
+    const base = defaultState();
+    return {...base, ...s, days: {...base.days, ...(s.days||{})}};
+  } catch { return defaultState(); }
+}
+function save(s) { localStorage.setItem(KEY, JSON.stringify(s)); }
+let state = load();
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.style.display = "block";
+  setTimeout(() => t.style.display = "none", 1800);
+}
+function dayComplete(d) {
+  const x = state.days[d.n] || {};
+  return !!(x.lecture && x.lab && x.anki);
+}
+function counts() {
+  let doneDays = 0, tasks = 0, doneTasks = 0;
+  DAYS.forEach(d => {
+    const x = state.days[d.n] || {};
+    ["lecture","lab","anki"].forEach(k => { tasks++; if (x[k]) doneTasks++; });
+    if (dayComplete(d)) doneDays++;
+  });
+  const sim = state.boson.filter(b => b.mode === "Simulation").map(b => +b.score);
+  return {doneDays, tasks, doneTasks, best: sim.length ? Math.max(...sim) : 0};
+}
+function currentPhase() {
+  const firstOpen = DAYS.find(d => !dayComplete(d));
+  if (!firstOpen || firstOpen.n <= 10) return {name:"Phase 1 · Foundations", note:"Days 1–10 + Boson Exam A + CLI Lab 1–2"};
+  if (firstOpen.n <= 58) return {name:"Phase 2 · Core lockstep", note:"Finish the block, CLI lab, then Boson"};
+  const best = counts().best;
+  if (best >= 85) return {name:"Phase 3 · Book the exam", note:"Hold 85%+ on Boson Simulation"};
+  return {name:"Phase 3 · Exam polish", note:"Mega Lab + full Boson Simulation rotation"};
+}
+function renderDashboard() {
+  const c = counts();
+  document.getElementById("stat-days").innerHTML = `${c.doneDays}<small>/63 days</small>`;
+  document.getElementById("bar-days").style.width = (c.doneDays/63*100).toFixed(1)+"%";
+  document.getElementById("stat-tasks").textContent = `${c.doneTasks} of ${c.tasks} lecture/lab/Anki tasks complete`;
+  document.getElementById("stat-boson").innerHTML = c.best ? `${c.best}%<small> best sim</small>` : `—<small> no sim yet</small>`;
+  document.getElementById("bar-boson").style.width = Math.min(100, c.best)+"%";
+  const ph = currentPhase();
+  document.getElementById("stat-phase").textContent = ph.name;
+  document.getElementById("stat-phase-note").textContent = ph.note;
+  document.getElementById("stat-streak").innerHTML = `${state.streak||0}<small> days</small>`;
+  document.getElementById("stat-last").textContent = state.lastStudy ? ("Last study: " + state.lastStudy) : "No activity logged yet";
+  document.getElementById("p1-status").textContent = `Phase 1 days complete: ${DAYS.filter(d => d.block==="p1" && dayComplete(d)).length}/10`;
+  const next = DAYS.find(d => !dayComplete(d)) || DAYS[DAYS.length-1];
+  const x = state.days[next.n] || {};
+  document.getElementById("next-up").innerHTML = `
+    <h4 style="margin:6px 0 8px">Day ${next.n}: ${next.title}</h4>
+    <p class="tiny">${next.boson || "Watch → lab → CLI practice → Anki."}</p>
+    ${next.links.yt ? `<p><a href="${next.links.yt}" target="_blank" rel="noopener">Open lecture on YouTube</a></p>` : `<p><a href="https://www.youtube.com/playlist?list=PLxbwE86jKRgMpuZuLBivzlM8s2Dk5lXBQ" target="_blank" rel="noopener">Open course playlist</a></p>`}
+    <p class="tiny">Lecture ${x.lecture?"✓":"○"} · Lab ${x.lab?"✓":"○"} · Anki ${x.anki?"✓":"○"}</p>
+    <button class="btn" onclick="document.querySelector('[data-view=plan]').click()">Jump to this day</button>
+    <button class="btn ghost" onclick="document.querySelector('[data-view=cli]').click()">Open CLI Lab</button>`;
+}
+function renderDays() {
+  const q = (document.getElementById("search").value || "").toLowerCase();
+  const block = document.getElementById("filter-block").value;
+  const st = document.getElementById("filter-status").value;
+  const host = document.getElementById("day-list");
+  host.innerHTML = "";
+  DAYS.forEach(d => {
+    const x = state.days[d.n] || {lecture:false,lab:false,anki:false,notes:false,memo:""};
+    const complete = dayComplete(d);
+    if (block !== "all" && d.block !== block) return;
+    if (st === "done" && !complete) return;
+    if (st === "open" && complete) return;
+    if (q && !(`day ${d.n} ${d.title} ${d.boson}`).toLowerCase().includes(q)) return;
+    const el = document.createElement("div");
+    el.className = "day" + (complete ? " complete" : "");
+    el.id = "day-"+d.n;
+    el.innerHTML = `
+      <div class="row" style="justify-content:space-between">
+        <h4>Day ${d.n}: ${d.title} ${complete ? '<span class="pill done">complete</span>' : '<span class="pill open">in progress</span>'}</h4>
+        <a class="tiny" href="${d.links.yt || "https://www.youtube.com/playlist?list=PLxbwE86jKRgMpuZuLBivzlM8s2Dk5lXBQ"}" target="_blank" rel="noopener">YouTube</a>
+      </div>
+      <p class="tiny" style="margin:6px 0 10px">${d.boson || "Lecture → Packet Tracer → CLI Lab → Anki."}</p>
+      <div class="checks">
+        <label class="chk"><input type="checkbox" data-day="${d.n}" data-k="lecture" ${x.lecture?"checked":""}> Lecture</label>
+        <label class="chk"><input type="checkbox" data-day="${d.n}" data-k="lab" ${x.lab?"checked":""}> Lab</label>
+        <label class="chk"><input type="checkbox" data-day="${d.n}" data-k="anki" ${x.anki?"checked":""}> Anki</label>
+        <label class="chk"><input type="checkbox" data-day="${d.n}" data-k="notes" ${x.notes?"checked":""}> Notes</label>
+      </div>
+      <div class="day-actions">
+        <button class="btn ghost" data-go="ask-day-${d.n}" data-ai ${typeof aiReady!=="undefined"&&aiReady?"":"disabled"}>Teach me this day</button>
+        <button class="btn ghost" data-go="quiz-day-${d.n}">Quiz this day</button>
+        ${(d.links.notes||[]).map((u,i,a) => `<a href="${u}" target="_blank" rel="noopener">${a.length>1?"Notes part "+(i+1):"Day notes"}</a>`).join("")}
+        ${d.links.lab ? `<a href="${d.links.lab}" target="_blank" rel="noopener">Lab video</a>` : ""}
+        ${d.links.anki ? `<a href="${d.links.anki}" target="_blank" rel="noopener">Anki video</a>` : ""}
+      </div>
+      <textarea data-memo="${d.n}" placeholder="Personal notes, missed Boson items, commands…" style="margin-top:10px">${x.memo||""}</textarea>`;
+    host.appendChild(el);
+  });
+}
+function renderBoson() {
+  const rows = [...state.boson].reverse();
+  if (!rows.length) {
+    document.getElementById("bx-table").innerHTML = "<p class='tiny'>No attempts logged yet.</p>";
+    return;
+  }
+  document.getElementById("bx-table").innerHTML = `<table><thead><tr><th>When</th><th>Exam</th><th>Mode</th><th>Score</th><th>Weak</th><th>Notes</th><th></th></tr></thead><tbody>
+    ${rows.map((b,i)=>`<tr><td>${b.when}</td><td>${b.exam}</td><td>${b.mode}</td>
+    <td><strong style="color:${b.score>=85?'var(--good)':b.score>=70?'var(--warn)':'var(--bad)'}">${b.score}%</strong></td>
+    <td>${b.weak||""}</td><td>${b.notes||""}</td>
+    <td><button class="btn ghost" data-del="${state.boson.length-1-i}">Delete</button></td></tr>`).join("")}
+  </tbody></table>`;
+}
+function touchStudy() {
+  const today = new Date().toISOString().slice(0,10);
+  if (state.lastStudy !== today) {
+    const y = new Date(); y.setDate(y.getDate()-1);
+    state.streak = (state.lastStudy === y.toISOString().slice(0,10)) ? (state.streak||0)+1 : 1;
+    state.lastStudy = today;
+  }
+}
+function renderAll() {
+  renderDashboard(); renderDays(); renderBoson();
+  if (state.examDate) {
+    document.getElementById("exam-date").value = state.examDate;
+    const diff = Math.ceil((new Date(state.examDate) - new Date()) / 86400000);
+    document.getElementById("exam-countdown").textContent = diff >= 0 ? `${diff} days until exam date.` : "Exam date is in the past.";
+  }
+}
+document.querySelectorAll(".tab").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    ["dashboard","tutor","quiz","subnet","plan","cli","boson","resources","settings"].forEach(v => {
+      document.getElementById("view-"+v).classList.toggle("hidden", btn.dataset.view !== v);
+    });
+    if (btn.dataset.view === "cli") { renderLabPanel(); focusTerm(); }
+  });
+});
+document.getElementById("day-list").addEventListener("change", e => {
+  if (e.target.dataset.day) {
+    state.days[e.target.dataset.day][e.target.dataset.k] = e.target.checked;
+    touchStudy(); save(state); renderAll();
+  }
+});
+document.getElementById("day-list").addEventListener("input", e => {
+  if (e.target.dataset.memo) { state.days[e.target.dataset.memo].memo = e.target.value; save(state); }
+});
+["search","filter-block","filter-status"].forEach(id => document.getElementById(id).addEventListener("input", renderDays));
+document.getElementById("bx-add").addEventListener("click", () => {
+  const score = Number(document.getElementById("bx-score").value);
+  if (Number.isNaN(score) || score < 0 || score > 100) return toast("Enter a score 0–100");
+  state.boson.push({
+    exam: document.getElementById("bx-exam").value,
+    mode: document.getElementById("bx-mode").value, score,
+    weak: document.getElementById("bx-weak").value.trim(),
+    notes: document.getElementById("bx-notes").value.trim(),
+    when: new Date().toISOString().slice(0,16).replace("T"," ")
+  });
+  touchStudy(); save(state); renderAll();
+  document.getElementById("bx-score").value = document.getElementById("bx-weak").value = document.getElementById("bx-notes").value = "";
+  toast("Boson attempt saved");
+});
+document.getElementById("bx-table").addEventListener("click", e => {
+  if (e.target.dataset.del != null) { state.boson.splice(+e.target.dataset.del, 1); save(state); renderAll(); }
+});
+document.getElementById("btn-export").addEventListener("click", () => exportProgress());
+document.getElementById("btn-import").addEventListener("change", e => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (data.study) state = {...defaultState(), ...data.study};
+      else state = {...defaultState(), ...data};
+      if (data.lab) restoreLab(data.lab);
+      save(state); renderAll(); toast("Imported");
+    } catch { toast("Invalid file"); }
+  };
+  reader.readAsText(file);
+});
+document.getElementById("btn-reset").addEventListener("click", () => {
+  if (confirm("Erase study progress?")) { state = defaultState(); save(state); renderAll(); }
+});
+document.getElementById("save-date").addEventListener("click", () => {
+  state.examDate = document.getElementById("exam-date").value; save(state); renderAll(); toast("Exam date saved");
+});
+
+/* ===================== CLI SIMULATOR ===================== */
+const LINKS = [
+  {a:"PC1", ai:"eth0", b:"SW1", bi:"FastEthernet0/1"},
+  {a:"SW1", ai:"FastEthernet0/24", b:"R1", bi:"GigabitEthernet0/0"},
+  {a:"R1", ai:"GigabitEthernet0/1", b:"R2", bi:"GigabitEthernet0/0"},
+  {a:"R2", ai:"GigabitEthernet0/1", b:"PC2", bi:"eth0"}
+];
+
+function iface(name, extra={}) {
+  return {
+    name, enabled: false, ip: null, mask: null, desc: "",
+    mode: extra.mode || "routed", accessVlan: extra.accessVlan || 1,
+    trunk: extra.trunk || false, allowed: extra.allowed || "1-4094",
+    natInside: false, natOutside: false
+  };
+}
+function baseDevices() {
+  return {
+    SW1: {
+      type:"switch", hostname:"SW1", banner:"", enableSecret:"cisco",
+      vlans:{1:{name:"default"},10:{name:""},20:{name:""}},
+      ifaces:{
+        "FastEthernet0/1": iface("FastEthernet0/1",{mode:"access"}),
+        "FastEthernet0/2": iface("FastEthernet0/2",{mode:"access"}),
+        "FastEthernet0/24": iface("FastEthernet0/24",{mode:"access"})
+      },
+      static:[], ospf:null, acls:{}, nat:null, users:{cisco:"cisco"}
+    },
+    R1: {
+      type:"router", hostname:"R1", banner:"", enableSecret:"cisco",
+      vlans:{},
+      ifaces:{
+        "GigabitEthernet0/0": iface("GigabitEthernet0/0"),
+        "GigabitEthernet0/1": iface("GigabitEthernet0/1"),
+        "Loopback0": iface("Loopback0")
+      },
+      static:[], ospf:null, acls:{}, nat:null, users:{cisco:"cisco"}
+    },
+    R2: {
+      type:"router", hostname:"R2", banner:"", enableSecret:"cisco",
+      vlans:{},
+      ifaces:{
+        "GigabitEthernet0/0": iface("GigabitEthernet0/0"),
+        "GigabitEthernet0/1": iface("GigabitEthernet0/1"),
+        "Loopback0": iface("Loopback0")
+      },
+      static:[], ospf:null, acls:{}, nat:null, users:{cisco:"cisco"}
+    },
+    PC1: { type:"pc", hostname:"PC1", ip:"10.0.0.10", mask:"255.255.255.0", gw:"10.0.0.1", ifaces:{eth0:{name:"eth0",enabled:true,ip:"10.0.0.10",mask:"255.255.255.0"}} },
+    PC2: { type:"pc", hostname:"PC2", ip:"10.0.2.10", mask:"255.255.255.0", gw:"10.0.2.1", ifaces:{eth0:{name:"eth0",enabled:true,ip:"10.0.2.10",mask:"255.255.255.0"}} }
+  };
+}
+
+let lab = { devices: baseDevices(), current:"SW1", mode:"user", ctx:null, history:[], histIdx:0 };
+const LABS = [
+  {id:"lab1", title:"Lab 1 · First CLI (Days 4–9)", why:"Hostname, enable, conf t, interface up, show commands.",
+    goals:[
+      {id:"hn", text:"Set SW1 hostname to BRANCH-SW", check:()=> lab.devices.SW1.hostname==="BRANCH-SW"},
+      {id:"en", text:"Set enable secret on SW1", check:()=> !!lab.devices.SW1.enableSecret && lab.devices.SW1.enableSecret!==""},
+      {id:"up", text:"no shutdown Fa0/1 and Fa0/24 on SW1", check:()=> lab.devices.SW1.ifaces["FastEthernet0/1"].enabled && lab.devices.SW1.ifaces["FastEthernet0/24"].enabled}
+    ]},
+  {id:"lab2", title:"Lab 2 · Addressing (Days 8–11)", why:"Put IPs on the routed links and verify with show ip int brief + ping.",
+    goals:[
+      {id:"r1l", text:"R1 G0/0 = 10.0.0.1/24 up", check:()=> ipEq(lab.devices.R1.ifaces["GigabitEthernet0/0"],"10.0.0.1","255.255.255.0") && lab.devices.R1.ifaces["GigabitEthernet0/0"].enabled},
+      {id:"r1w", text:"R1 G0/1 = 10.0.12.1/30 up", check:()=> ipEq(lab.devices.R1.ifaces["GigabitEthernet0/1"],"10.0.12.1","255.255.255.252") && lab.devices.R1.ifaces["GigabitEthernet0/1"].enabled},
+      {id:"r2w", text:"R2 G0/0 = 10.0.12.2/30 up", check:()=> ipEq(lab.devices.R2.ifaces["GigabitEthernet0/0"],"10.0.12.2","255.255.255.252") && lab.devices.R2.ifaces["GigabitEthernet0/0"].enabled},
+      {id:"r2l", text:"R2 G0/1 = 10.0.2.1/24 up", check:()=> ipEq(lab.devices.R2.ifaces["GigabitEthernet0/1"],"10.0.2.1","255.255.255.0") && lab.devices.R2.ifaces["GigabitEthernet0/1"].enabled}
+    ]},
+  {id:"lab3", title:"Lab 3 · VLANs (Days 16–18)", why:"Create VLAN 10, name it, and put Fa0/1 in access VLAN 10. Trunk Fa0/24.",
+    goals:[
+      {id:"v10", text:"VLAN 10 exists named SALES", check:()=> (lab.devices.SW1.vlans[10]||{}).name==="SALES"},
+      {id:"acc", text:"Fa0/1 access VLAN 10", check:()=> lab.devices.SW1.ifaces["FastEthernet0/1"].mode==="access" && lab.devices.SW1.ifaces["FastEthernet0/1"].accessVlan===10},
+      {id:"trk", text:"Fa0/24 is a trunk", check:()=> lab.devices.SW1.ifaces["FastEthernet0/24"].mode==="trunk" || lab.devices.SW1.ifaces["FastEthernet0/24"].trunk}
+    ]},
+  {id:"lab4", title:"Lab 4 · Static routing (Day 11)", why:"After Lab 2 IPs, add statics so PC1 can ping PC2.",
+    goals:[
+      {id:"s1", text:"R1 has route to 10.0.2.0/24 via 10.0.12.2", check:()=> hasRoute(lab.devices.R1,"10.0.2.0","255.255.255.0","10.0.12.2")},
+      {id:"s2", text:"R2 has route to 10.0.0.0/24 via 10.0.12.1", check:()=> hasRoute(lab.devices.R2,"10.0.0.0","255.255.255.0","10.0.12.1")},
+      {id:"pg", text:"PC1 can ping 10.0.2.10 (needs IPs + routes + up links)", check:()=> canPing("PC1","10.0.2.10").ok}
+    ]},
+  {id:"lab5", title:"Lab 5 · OSPF (Days 26–28)", why:"Single-area OSPF on R1 and R2 instead of statics.",
+    goals:[
+      {id:"o1", text:"R1 router ospf 1 with a network statement", check:()=> !!(lab.devices.R1.ospf && lab.devices.R1.ospf.networks.length)},
+      {id:"o2", text:"R2 router ospf 1 with a network statement", check:()=> !!(lab.devices.R2.ospf && lab.devices.R2.ospf.networks.length)},
+      {id:"adj", text:"OSPF adjacency R1↔R2 (matching area on the /30)", check:()=> ospfAdj("R1","R2")}
+    ]},
+  {id:"lab6", title:"Lab 6 · Standard ACL (Days 34–35)", why:"Block PC1 from reaching PC2, then permit it again.",
+    goals:[
+      {id:"acl", text:"An ACL exists on R1 or R2", check:()=> Object.keys(lab.devices.R1.acls).length+Object.keys(lab.devices.R2.acls).length>0},
+      {id:"app", text:"That ACL is applied inbound or outbound on an interface", check:()=> ifaceHasAcl("R1")||ifaceHasAcl("R2")}
+    ]},
+  {id:"lab7", title:"Lab 7 · NAT overload (Days 44–45)", why:"Mark inside/outside and ip nat inside source list … overload.",
+    goals:[
+      {id:"in", text:"R1 has an inside interface", check:()=> Object.values(lab.devices.R1.ifaces).some(i=>i.natInside)},
+      {id:"out", text:"R1 has an outside interface", check:()=> Object.values(lab.devices.R1.ifaces).some(i=>i.natOutside)},
+      {id:"ov", text:"NAT overload configured on R1", check:()=> !!(lab.devices.R1.nat && lab.devices.R1.nat.overload)}
+    ]},
+  {id:"free", title:"Free play / sandbox", why:"Reset whenever you want. Break things on purpose.", goals:[]}
+];
+let currentLabId = "lab1";
+
+function ipEq(ifc, ip, mask){ return ifc && ifc.ip===ip && ifc.mask===mask; }
+function hasRoute(dev, net, mask, nh){ return (dev.static||[]).some(r => r.net===net && r.mask===mask && r.nh===nh); }
+function ifaceHasAcl(name){ return Object.values(lab.devices[name].ifaces).some(i => i.aclIn || i.aclOut); }
+
+function ipToInt(ip){ return ip.split(".").reduce((a,o)=> (a<<8)+(+o), 0) >>> 0; }
+function intToIp(n){ return [(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255].join("."); }
+function maskToPrefix(mask){
+  const n = ipToInt(mask); let c=0; for(let i=31;i>=0;i--){ if(n&(1<<i)) c++; else break; } return c;
+}
+function wildcardToMask(w){ return intToIp((~ipToInt(w))>>>0); }
+function netOf(ip, mask){ return intToIp(ipToInt(ip) & ipToInt(mask)); }
+function inNet(ip, net, mask){ return (ipToInt(ip)&ipToInt(mask)) === (ipToInt(net)&ipToInt(mask)); }
+
+function connectedRoutes(dev){
+  const out=[];
+  Object.values(dev.ifaces||{}).forEach(i=>{
+    if(i.enabled && i.ip && i.mask) out.push({net:netOf(i.ip,i.mask), mask:i.mask, type:"C", nh:i.name, iface:i.name});
+  });
+  if(dev.type==="pc" && dev.ip) out.push({net:netOf(dev.ip,dev.mask), mask:dev.mask, type:"C", nh:"eth0", iface:"eth0"});
+  return out;
+}
+function allRoutes(name){
+  const dev = lab.devices[name];
+  const routes = connectedRoutes(dev);
+  (dev.static||[]).forEach(r => routes.push({net:r.net, mask:r.mask, type:"S", nh:r.nh, iface:null}));
+  if(dev.ospf){
+    Object.keys(lab.devices).forEach(other=>{
+      if(other===name) return;
+      if(!ospfAdj(name, other)) return;
+      connectedRoutes(lab.devices[other]).forEach(r=>{
+        if(!routes.some(x=>x.net===r.net && x.mask===r.mask))
+          routes.push({net:r.net, mask:r.mask, type:"O", nh: peerIp(name, other), iface:null});
+      });
+    });
+  }
+  return routes;
+}
+function peerIp(a,b){
+  const link = LINKS.find(l => (l.a===a&&l.b===b)||(l.a===b&&l.b===a));
+  if(!link) return null;
+  const other = link.a===a ? {d:b,i:link.bi} : {d:b,i:link.ai};
+  const ifc = lab.devices[other.d].ifaces[other.i];
+  return ifc && ifc.ip;
+}
+function ospfAdj(a,b){
+  const A=lab.devices[a], B=lab.devices[b];
+  if(!A.ospf || !B.ospf) return false;
+  const link = LINKS.find(l => (l.a===a&&l.b===b)||(l.a===b&&l.b===a));
+  if(!link) return false;
+  const ia = lab.devices[link.a].ifaces[link.ai];
+  const ib = lab.devices[link.b].ifaces[link.bi];
+  if(!ia||!ib||!ia.enabled||!ib.enabled||!ia.ip||!ib.ip) return false;
+  const match = (dev, ip) => (dev.ospf.networks||[]).some(n => inNet(ip, n.net, wildcardToMask(n.wild)));
+  const localA = a===link.a ? ia : ib;
+  const localB = a===link.a ? ib : ia;
+  return match(A, localA.ip) && match(B, localB.ip);
+}
+function lookup(name, dest){
+  const routes = allRoutes(name).sort((x,y)=> maskToPrefix(y.mask)-maskToPrefix(x.mask));
+  return routes.find(r => inNet(dest, r.net, r.mask)) || null;
+}
+function canPing(srcName, destIp){
+  const src = lab.devices[srcName];
+  if(src.type==="pc"){
+    if(inNet(destIp, netOf(src.ip,src.mask), src.mask)) {
+      return reachFromL2(srcName, destIp);
+    }
+    if(!src.gw) return {ok:false, msg:"Gateway not set on PC"};
+    return walk(srcName, src.gw, destIp, 8);
+  }
+  return walk(srcName, destIp, destIp, 8);
+}
+function reachFromL2(srcName, destIp){
+  if(ownerOfIp(destIp)) return {ok:true};
+  return {ok:false, msg:"Destination host unreachable"};
+}
+function ownerOfIp(ip){
+  for(const [name,dev] of Object.entries(lab.devices)){
+    if(dev.type==="pc" && dev.ip===ip) return name;
+    for(const i of Object.values(dev.ifaces||{})) if(i.ip===ip) return name;
+  }
+  return null;
+}
+function walk(from, nextHop, dest, ttl){
+  if(ttl<=0) return {ok:false, msg:"TTL expired"};
+  const owner = ownerOfIp(nextHop) || from;
+  const r = lookup(owner, dest);
+  if(!r) return {ok:false, msg:`U ${owner}: no route to ${dest}`};
+  if(r.type==="C"){
+    const tgt = ownerOfIp(dest);
+    if(tgt) return {ok:true};
+    return {ok:false, msg:"Destination host unreachable"};
+  }
+  return walk(owner, r.nh, dest, ttl-1);
+}
+
+function normIface(tok, dev){
+  if(!tok) return null;
+  const t = tok.toLowerCase();
+  const map = {
+    "g0/0":"GigabitEthernet0/0","gi0/0":"GigabitEthernet0/0","gigabitethernet0/0":"GigabitEthernet0/0",
+    "g0/1":"GigabitEthernet0/1","gi0/1":"GigabitEthernet0/1","gigabitethernet0/1":"GigabitEthernet0/1",
+    "f0/1":"FastEthernet0/1","fa0/1":"FastEthernet0/1","fastethernet0/1":"FastEthernet0/1",
+    "f0/2":"FastEthernet0/2","fa0/2":"FastEthernet0/2","fastethernet0/2":"FastEthernet0/2",
+    "f0/24":"FastEthernet0/24","fa0/24":"FastEthernet0/24","fastethernet0/24":"FastEthernet0/24",
+    "lo0":"Loopback0","loopback0":"Loopback0","eth0":"eth0"
+  };
+  if(map[t]) return map[t];
+  const exact = Object.keys(dev.ifaces||{}).find(k => k.toLowerCase()===t);
+  return exact || null;
+}
+
+function promptOf(){
+  const d = lab.devices[lab.current];
+  const h = d.hostname;
+  if(d.type==="pc") return `${h}> `;
+  if(lab.mode==="user") return `${h}>`;
+  if(lab.mode==="priv") return `${h}#`;
+  if(lab.mode==="config") return `${h}(config)#`;
+  if(lab.mode==="if") return `${h}(config-if)#`;
+  if(lab.mode==="vlan") return `${h}(config-vlan)#`;
+  if(lab.mode==="router") return `${h}(config-router)#`;
+  if(lab.mode==="line") return `${h}(config-line)#`;
+  if(lab.mode==="acl") return `${h}(config-std-nacl)#`;
+  return `${h}>`;
+}
+
+function print(text, cls=""){
+  const out = document.getElementById("term-out");
+  const div = document.createElement("div");
+  if(cls) div.className = cls;
+  div.textContent = text;
+  out.appendChild(div);
+  out.scrollTop = out.scrollHeight;
+}
+function banner(){
+  print("CCNA Lockstep IOS-style teaching CLI. Type ? for help. Not real Cisco IOS.\n");
+  print("Connected to " + lab.current + " console.\n");
+}
+function refreshPrompt(){
+  document.getElementById("ps1").textContent = promptOf();
+  document.getElementById("term-title").textContent = lab.current + " console";
+  const names = {user:"user EXEC", priv:"privileged EXEC", config:"global config", if:"interface config", vlan:"VLAN config", router:"router config", line:"line config", acl:"ACL config"};
+  document.getElementById("term-mode").textContent = lab.devices[lab.current].type==="pc" ? "PC command prompt" : (names[lab.mode]||lab.mode);
+  document.querySelectorAll("#dev-btns .btn").forEach(b => b.classList.toggle("on", b.dataset.dev===lab.current));
+}
+function switchDevice(name){
+  lab.current = name; lab.mode = lab.devices[name].type==="pc" ? "user" : "user"; lab.ctx=null;
+  print("\n% Switching console to " + name + "\n", "ok");
+  refreshPrompt();
+}
+function focusTerm(){ document.getElementById("term-in").focus(); }
+
+function showRun(dev){
+  let s = "Building configuration...\n\nCurrent configuration:\n!\nversion 15.2\n";
+  s += `hostname ${dev.hostname}\n`;
+  if(dev.enableSecret) s += `enable secret 5 (set)\n`;
+  if(dev.banner) s += `banner motd #${dev.banner}#\n`;
+  s += "!\n";
+  if(dev.type==="switch"){
+    Object.keys(dev.vlans).sort((a,b)=>+a-+b).forEach(id=>{
+      if(+id===1) return;
+      s += `vlan ${id}\n`;
+      if(dev.vlans[id].name) s += ` name ${dev.vlans[id].name}\n`;
+    });
+    s += "!\n";
+  }
+  Object.values(dev.ifaces||{}).forEach(i=>{
+    s += `interface ${i.name}\n`;
+    if(i.desc) s += ` description ${i.desc}\n`;
+    if(i.ip && i.mask) s += ` ip address ${i.ip} ${i.mask}\n`;
+    if(dev.type==="switch"){
+      if(i.mode==="trunk") s += " switchport mode trunk\n";
+      else { s += " switchport mode access\n"; s += ` switchport access vlan ${i.accessVlan}\n`; }
+    }
+    if(i.natInside) s += " ip nat inside\n";
+    if(i.natOutside) s += " ip nat outside\n";
+    if(i.aclIn) s += ` ip access-group ${i.aclIn} in\n`;
+    if(i.aclOut) s += ` ip access-group ${i.aclOut} out\n`;
+    s += i.enabled ? " no shutdown\n" : " shutdown\n";
+    s += "!\n";
+  });
+  (dev.static||[]).forEach(r => s += `ip route ${r.net} ${r.mask} ${r.nh}\n`);
+  if(dev.ospf){
+    s += `router ospf ${dev.ospf.pid}\n`;
+    if(dev.ospf.rid) s += ` router-id ${dev.ospf.rid}\n`;
+    (dev.ospf.networks||[]).forEach(n => s += ` network ${n.net} ${n.wild} area ${n.area}\n`);
+  }
+  if(dev.nat && dev.nat.overload) s += `ip nat inside source list ${dev.nat.list} interface ${dev.nat.iface} overload\n`;
+  Object.entries(dev.acls||{}).forEach(([id,rules])=>{
+    rules.forEach(r => s += `access-list ${id} ${r.action} ${r.src}\n`);
+  });
+  s += "!\nend\n";
+  return s;
+}
+
+function showIpIntBr(dev){
+  let s = "Interface                  IP-Address      OK? Method Status                Protocol\n";
+  Object.values(dev.ifaces).forEach(i=>{
+    const st = i.enabled ? "up" : "administratively down";
+    const proto = i.enabled ? "up" : "down";
+    s += `${i.name.padEnd(26)}${(i.ip||"unassigned").padEnd(16)}YES manual ${st.padEnd(22)}${proto}\n`;
+  });
+  return s;
+}
+function showVlan(dev){
+  if(dev.type!=="switch") return "% Invalid input detected at '^' marker.";
+  let s = "VLAN Name                             Status    Ports\n---- -------------------------------- --------- -------------------------------\n";
+  const ports = {};
+  Object.values(dev.ifaces).forEach(i=>{
+    if(i.mode==="access"){
+      ports[i.accessVlan] = ports[i.accessVlan]||[];
+      ports[i.accessVlan].push(shortIf(i.name));
+    }
+  });
+  Object.keys(dev.vlans).sort((a,b)=>+a-+b).forEach(id=>{
+    const name = (dev.vlans[id].name || (id==="1"?"default":"VLAN"+id)).padEnd(33);
+    s += `${String(id).padEnd(5)}${name}active    ${(ports[id]||[]).join(", ")}\n`;
+  });
+  return s;
+}
+function shortIf(n){ return n.replace("FastEthernet","Fa").replace("GigabitEthernet","Gi").replace("Loopback","Lo"); }
+function showRoute(name){
+  const routes = allRoutes(name);
+  let s = `Codes: C - connected, S - static, O - OSPF\n\n`;
+  if(!routes.length) s += "Gateway of last resort is not set\n";
+  routes.forEach(r=>{
+    s += `${r.type}    ${r.net}/${maskToPrefix(r.mask)} `;
+    s += r.type==="C" ? `is directly connected, ${shortIf(r.iface)}\n` : `via ${r.nh}\n`;
+  });
+  return s;
+}
+
+const HELP = {
+  user: "enable   ping   traceroute   show   ?   exit",
+  priv: "configure terminal   show running-config   show ip interface brief\nshow ip route   show vlan brief   show cdp neighbors   ping   write   copy run start   disable   exit",
+  config: "hostname   enable secret   interface   vlan   router ospf   ip route\nip nat   access-list   line   banner motd   do show ...   end   exit",
+  if: "ip address A.B.C.D M.M.M.M   no shutdown   shutdown   description\nswitchport mode access|trunk   switchport access vlan N\nip nat inside|outside   ip access-group NAME in|out   exit",
+  vlan: "name NAME   exit",
+  router: "network A.B.C.D W.W.W.W area N   router-id A.B.C.D   exit",
+  line: "password   login   logging synchronous   exec-timeout   exit",
+  acl: "permit/deny any | host A.B.C.D | A.B.C.D W.W.W.W   exit"
+};
+
+function handle(raw){
+  const line = raw.replace(/\s+/g," ").trim();
+  const dev = lab.devices[lab.current];
+  if(!line) return "";
+  if(line==="?" || line==="help") return (HELP[lab.mode] || HELP.user) + "\n";
+  const parts = line.split(" ");
+  const cmd = parts[0].toLowerCase();
+  const rest = parts.slice(1);
+
+  if(dev.type==="pc") return handlePc(dev, line, parts);
+
+  if(cmd==="enable" || cmd==="en"){ lab.mode="priv"; return ""; }
+  if(cmd==="disable"){ lab.mode="user"; return ""; }
+  if(cmd==="end"){ lab.mode="priv"; lab.ctx=null; return ""; }
+  if(cmd==="exit"){
+    if(lab.mode==="if"||lab.mode==="vlan"||lab.mode==="router"||lab.mode==="line"||lab.mode==="acl"){ lab.mode="config"; lab.ctx=null; return ""; }
+    if(lab.mode==="config"){ lab.mode="priv"; return ""; }
+    if(lab.mode==="priv"){ lab.mode="user"; return ""; }
+    return "% Logout\n";
+  }
+  if(cmd==="do" && lab.mode!=="user" && lab.mode!=="priv"){
+    const saved=lab.mode, ctx=lab.ctx; lab.mode="priv";
+    const out=handle(rest.join(" ")); lab.mode=saved; lab.ctx=ctx; return out;
+  }
+
+  if(cmd==="configure" || cmd==="conf" || cmd==="config"){
+    if(lab.mode==="user") return "% Privilege level insufficient. Use enable first.\n";
+    if(rest[0] && rest[0].startsWith("t")) { lab.mode="config"; return ""; }
+    return "% Incomplete command.\n";
+  }
+
+  if(cmd==="show" || cmd==="sh"){
+    if(lab.mode==="user" && !["version","clock","history"].includes((rest[0]||""))) return "% Privilege required for that show command. Type enable.\n";
+    return handleShow(dev, rest);
+  }
+
+  if(cmd==="ping"){
+    const target = rest[0];
+    if(!target) return "% Incomplete command.\n";
+    const res = canPing(lab.current, target);
+    if(res.ok) return `Type escape sequence to abort.\nSending 5, 100-byte ICMP Echos to ${target}, timeout is 2 seconds:\n!!!!!\nSuccess rate is 100 percent (5/5)\n`;
+    return `Type escape sequence to abort.\nSending 5, 100-byte ICMP Echos to ${target}, timeout is 2 seconds:\n.....\nSuccess rate is 0 percent (0/5)\n% ${res.msg||"Failed"}\n`;
+  }
+  if(cmd==="traceroute" || cmd==="trace"){
+    const target = rest[0]; if(!target) return "% Incomplete command.\n";
+    const res = canPing(lab.current, target);
+    return res.ok ? `Tracing the route to ${target}\n  1  ${target}  1 msec  1 msec  1 msec\n` : `% ${res.msg}\n`;
+  }
+  if((cmd==="write" || (cmd==="copy" && rest.join(" ").toLowerCase().includes("run"))) && lab.mode==="priv"){
+    return "Building configuration...\n[OK]\n";
+  }
+
+  if(lab.mode==="config") return handleConfig(dev, parts);
+  if(lab.mode==="if") return handleIf(dev, parts);
+  if(lab.mode==="vlan") return handleVlan(dev, parts);
+  if(lab.mode==="router") return handleRouter(dev, parts);
+  if(lab.mode==="line") return "OK\n";
+  if(lab.mode==="acl") return handleAclBody(dev, parts);
+
+  return `% Unknown command or mode. Type ? for help.\n`;
+}
+
+function handlePc(dev, line, parts){
+  const cmd=parts[0].toLowerCase();
+  if(cmd==="ipconfig" || cmd==="ifconfig") return `eth0  IPv4: ${dev.ip}  Mask: ${dev.mask}  GW: ${dev.gw}\n`;
+  if(cmd==="ping"){
+    const res=canPing(dev.hostname, parts[1]);
+    return res.ok ? `Pinging ${parts[1]} with 32 bytes of data:\nReply from ${parts[1]}: bytes=32 time=1ms TTL=64\nReply from ${parts[1]}: bytes=32 time=1ms TTL=64\nReply from ${parts[1]}: bytes=32 time=1ms TTL=64\nReply from ${parts[1]}: bytes=32 time=1ms TTL=64\n` : `Request timed out.\n% ${res.msg}\n`;
+  }
+  if(cmd==="?") return "ipconfig   ping   traceroute\n";
+  return `'${parts[0]}' is not recognized as a PC command.\n`;
+}
+
+function handleShow(dev, rest){
+  const a=(rest[0]||"").toLowerCase();
+  const b=(rest[1]||"").toLowerCase();
+  const c=(rest[2]||"").toLowerCase();
+  if(a==="running-config" || a==="run" || a==="running") return showRun(dev);
+  if(a==="startup-config" || a==="start") return "startup-config is empty in this lab (use write / copy run start).\n";
+  if(a==="version" || a==="ver") return `${dev.hostname} software, teaching simulator\nCisco IOS-like CLI for CCNA practice, version 15.2(SIM)\nuptime is 1 hour\n`;
+  if(a==="clock") return new Date().toString()+"\n";
+  if(a==="history") return lab.history.slice(-20).map((h,i)=>`  ${i+1}  ${h}`).join("\n")+"\n";
+  if(a==="ip" && (b==="interface"||b==="int") && (c.startsWith("br")||c==="")) return showIpIntBr(dev);
+  if(a==="ip" && b==="route") return showRoute(lab.current);
+  if(a==="ip" && b==="ospf" && c.startsWith("nei")) {
+    const others = Object.keys(lab.devices).filter(n => n!==lab.current && ospfAdj(lab.current,n));
+    if(!others.length) return "% No OSPF neighbors.\n";
+    return "Neighbor ID     Pri   State           Dead Time   Address\n"+others.map(n=>`${(lab.devices[n].ospf.rid||n).padEnd(16)}1     FULL/ -        00:00:38    ${peerIp(lab.current,n)}`).join("\n")+"\n";
+  }
+  if(a==="ip" && b==="protocols") return dev.ospf ? `Routing Protocol is "ospf ${dev.ospf.pid}"\n  Router ID ${dev.ospf.rid||"0.0.0.0"}\n` : "No routing protocols configured.\n";
+  if(a==="vlan") return showVlan(dev);
+  if(a==="interfaces" || a==="int" || a==="interface"){
+    if(b==="trunk"){
+      const trunks = Object.values(dev.ifaces).filter(i=>i.mode==="trunk");
+      if(!trunks.length) return "% No trunks.\n";
+      return trunks.map(i=>`${i.name}  mode trunk  allowed ${i.allowed}`).join("\n")+"\n";
+    }
+    if(b==="switchport"){
+      return Object.values(dev.ifaces).map(i=>`${i.name}: ${i.mode} vlan ${i.accessVlan}`).join("\n")+"\n";
+    }
+    return Object.values(dev.ifaces).map(i => `${i.name} is ${i.enabled?"up":"administratively down"}, line protocol is ${i.enabled?"up":"down"}\n  Description: ${i.desc||""}\n  Internet address is ${i.ip? i.ip+"/"+maskToPrefix(i.mask):"unassigned"}`).join("\n")+"\n";
+  }
+  if(a==="cdp" && b.startsWith("nei")){
+    const me=lab.current;
+    const rows = LINKS.filter(l=>l.a===me||l.b===me).map(l=>{
+      const other = l.a===me? {n:l.b, local:l.ai, remote:l.bi}:{n:l.a, local:l.bi, remote:l.ai};
+      return `${other.n.padEnd(10)} ${shortIf(other.local).padEnd(10)} ${lab.devices[other.n].type.padEnd(8)} ${shortIf(other.remote)}`;
+    });
+    return "Device ID  Local Intrfce  Capability  Platform  Port ID\n"+rows.join("\n")+"\n";
+  }
+  if(a==="access-lists" || (a==="ip" && b==="access-lists")){
+    const lines=[];
+    Object.entries(dev.acls||{}).forEach(([id,rules])=> rules.forEach((r,i)=> lines.push(`${id} ${i+1} ${r.action} ${r.src}`)));
+    return lines.join("\n")+"\n" || "No ACLs.\n";
+  }
+  return "% Invalid input detected at '^' marker.\n";
+}
+
+function handleConfig(dev, parts){
+  const cmd=parts[0].toLowerCase();
+  if(cmd==="hostname" || cmd==="host"){
+    if(!parts[1]) return "% Incomplete command.\n";
+    dev.hostname = parts[1]; return "";
+  }
+  if(cmd==="enable" && (parts[1]==="secret"||parts[1]==="password")){
+    dev.enableSecret = parts.slice(2).join(" ") || "cisco"; return "";
+  }
+  if(cmd==="banner"){
+    dev.banner = parts.slice(2).join(" ").replace(/#/g,"") || "Authorized access only"; return "";
+  }
+  if(cmd==="interface" || cmd==="int"){
+    const name = normIface(parts[1], dev);
+    if(!name || !dev.ifaces[name]) return `% Invalid interface ${parts[1]}\n`;
+    lab.mode="if"; lab.ctx={kind:"if", name}; return "";
+  }
+  if(cmd==="vlan"){
+    if(dev.type!=="switch") return "% VLANs exist on switches in this lab.\n";
+    const id=+parts[1];
+    if(!id) return "% Incomplete command.\n";
+    if(!dev.vlans[id]) dev.vlans[id]={name:""};
+    lab.mode="vlan"; lab.ctx={kind:"vlan", id}; return "";
+  }
+  if(cmd==="router" && (parts[1]||"").toLowerCase()==="ospf"){
+    const pid=+(parts[2]||1);
+    if(!dev.ospf) dev.ospf={pid, rid:null, networks:[]};
+    lab.mode="router"; lab.ctx={kind:"ospf"}; return "";
+  }
+  if(cmd==="ip" && parts[1]==="route"){
+    const net=parts[2], mask=parts[3], nh=parts[4];
+    if(!net||!mask||!nh) return "% Incomplete command. ip route NET MASK NEXT-HOP\n";
+    dev.static = (dev.static||[]).filter(r => !(r.net===net && r.mask===mask));
+    dev.static.push({net,mask,nh}); return "";
+  }
+  if(cmd==="no" && parts[1]==="ip" && parts[2]==="route"){
+    dev.static = (dev.static||[]).filter(r => !(r.net===parts[3] && r.mask===parts[4])); return "";
+  }
+  if(cmd==="ip" && parts[1]==="nat"){
+    if(parts[2]==="inside" && parts[3]==="source"){
+      dev.nat = {list: parts[5]||"1", iface: normIface(parts[7],dev) || parts[7] || "GigabitEthernet0/1", overload: (parts.join(" ").includes("overload"))};
+      return "";
+    }
+    return "% Try: ip nat inside source list 1 interface g0/1 overload\n";
+  }
+  if(cmd==="access-list" || cmd==="ip" && parts[1]==="access-list"){
+    const id = cmd==="access-list" ? parts[1] : parts[2];
+    if(!id) return "% Incomplete command.\n";
+    if(!dev.acls[id]) dev.acls[id]=[];
+    if((parts[2]==="permit"||parts[2]==="deny") || (parts[3]==="permit"||parts[3]==="deny")){
+      const action = parts.includes("deny") ? "deny" : "permit";
+      const src = parts.slice(parts.indexOf(action)+1).join(" ") || "any";
+      dev.acls[id].push({action, src}); return "";
+    }
+    lab.mode="acl"; lab.ctx={kind:"acl", id}; return "";
+  }
+  if(cmd==="line"){ lab.mode="line"; lab.ctx={kind:"line"}; return ""; }
+  if(cmd==="no") return "";
+  return "% Invalid input detected at '^' marker.\n";
+}
+
+function handleIf(dev, parts){
+  const ifc = dev.ifaces[lab.ctx.name];
+  const cmd=parts[0].toLowerCase();
+  if(cmd==="no" && parts[1]==="shutdown"){ ifc.enabled=true; return ""; }
+  if(cmd==="shutdown" || cmd==="shut"){ ifc.enabled=false; return ""; }
+  if(cmd==="description" || cmd==="desc"){ ifc.desc=parts.slice(1).join(" "); return ""; }
+  if(cmd==="ip" && parts[1]==="address"){
+    ifc.ip=parts[2]; ifc.mask=parts[3];
+    if(!ifc.ip||!ifc.mask) return "% Incomplete command. ip address A.B.C.D M.M.M.M\n";
+    return "";
+  }
+  if(cmd==="ip" && parts[1]==="nat"){
+    ifc.natInside = parts[2]==="inside";
+    ifc.natOutside = parts[2]==="outside";
+    return "";
+  }
+  if(cmd==="ip" && parts[1]==="access-group"){
+    if(parts[3]==="in") ifc.aclIn=parts[2];
+    else ifc.aclOut=parts[2];
+    return "";
+  }
+  if(cmd==="switchport" || cmd==="sw"){
+    if(dev.type!=="switch") return "% Switchport is for switch interfaces.\n";
+    if(parts[1]==="mode" && parts[2]==="access"){ ifc.mode="access"; ifc.trunk=false; return ""; }
+    if(parts[1]==="mode" && parts[2]==="trunk"){ ifc.mode="trunk"; ifc.trunk=true; return ""; }
+    if(parts[1]==="access" && parts[2]==="vlan"){ ifc.accessVlan=+(parts[3]||1); ifc.mode="access"; if(!dev.vlans[ifc.accessVlan]) dev.vlans[ifc.accessVlan]={name:""}; return ""; }
+    if(parts[1]==="trunk" && parts[2]==="allowed"){ ifc.allowed=parts.slice(4).join(" ")||"1-4094"; return ""; }
+  }
+  if(cmd==="duplex" || cmd==="speed") return "";
+  if(cmd==="no") return "";
+  return "% Invalid input detected at '^' marker.\n";
+}
+function handleVlan(dev, parts){
+  if(parts[0].toLowerCase()==="name"){ dev.vlans[lab.ctx.id].name = parts[1]||""; return ""; }
+  return "% Invalid input detected at '^' marker.\n";
+}
+function handleRouter(dev, parts){
+  const cmd=parts[0].toLowerCase();
+  if(cmd==="network"){
+    const net=parts[1], wild=parts[2], area=parts[4]||parts[3]||"0";
+    if(!net||!wild) return "% network A.B.C.D W.W.W.W area N\n";
+    dev.ospf.networks.push({net, wild, area:String(area).replace("area","") || "0"});
+    return "";
+  }
+  if(cmd==="router-id"){ dev.ospf.rid=parts[1]; return ""; }
+  return "% Invalid input detected at '^' marker.\n";
+}
+function handleAclBody(dev, parts){
+  const action=parts[0];
+  if(action==="permit"||action==="deny"){ dev.acls[lab.ctx.id].push({action, src:parts.slice(1).join(" ")||"any"}); return ""; }
+  return "% Invalid input detected at '^' marker.\n";
+}
+
+function serializeLab(){ return {devices:lab.devices, current:lab.current, currentLabId}; }
+function restoreLab(data){
+  if(data.devices) lab.devices = data.devices;
+  if(data.current) lab.current = data.current;
+  if(data.currentLabId) currentLabId = data.currentLabId;
+}
+
+function renderLabPanel(){
+  const sel=document.getElementById("lab-select");
+  if(!sel.options.length){
+    LABS.forEach(l=>{ const o=document.createElement("option"); o.value=l.id; o.textContent=l.title; sel.appendChild(o); });
+    sel.value=currentLabId;
+  }
+  const L = LABS.find(x=>x.id===currentLabId);
+  document.getElementById("lab-why").textContent = L.why;
+  document.getElementById("lab-obj").innerHTML = L.goals.map(g=>`<li data-g="${g.id}">${g.text}</li>`).join("") || "<li>No scored objectives — sandbox.</li>";
+  document.getElementById("dev-btns").innerHTML = Object.keys(lab.devices).map(n=>`<button class="btn ghost" data-dev="${n}">${n}</button>`).join("");
+  document.getElementById("topo").textContent =
+`PC1 (10.0.0.10/24 gw 10.0.0.1)
+  |
+  Fa0/1
+ SW1
+  Fa0/24
+  |
+  R1 G0/0  [ LAN 10.0.0.0/24 ]
+  R1 G0/1 ------------------- R2 G0/0     10.0.12.0/30
+                                R2 G0/1
+                                  |
+                                PC2 (10.0.2.10/24 gw 10.0.2.1)`;
+  refreshPrompt();
+}
+
+function checkLab(){
+  const L = LABS.find(x=>x.id===currentLabId);
+  let pass=0;
+  L.goals.forEach(g=>{
+    const ok=g.check();
+    if(ok) pass++;
+    const li=document.querySelector(`#lab-obj li[data-g="${g.id}"]`);
+    if(li) li.classList.toggle("hit", ok);
+  });
+  if(!L.goals.length) { toast("Sandbox — nothing to grade"); return; }
+  toast(`${pass}/${L.goals.length} objectives met`);
+  print(`\n% Lab check: ${pass}/${L.goals.length} objectives met\n`, pass===L.goals.length?"ok":"err");
+}
+
+document.getElementById("dev-btns").addEventListener("click", e=>{
+  if(e.target.dataset.dev) switchDevice(e.target.dataset.dev);
+});
+document.getElementById("lab-select").addEventListener("change", e=>{
+  currentLabId=e.target.value; renderLabPanel();
+});
+document.getElementById("lab-check").addEventListener("click", checkLab);
+document.getElementById("cli-clear").addEventListener("click", ()=>{ document.getElementById("term-out").innerHTML=""; banner(); });
+document.getElementById("cli-reset").addEventListener("click", ()=>{
+  if(!confirm("Reset all device configs in this lab?")) return;
+  lab.devices=baseDevices(); lab.mode="user"; lab.ctx=null; lab.current="SW1";
+  document.getElementById("term-out").innerHTML=""; banner(); refreshPrompt(); renderLabPanel();
+  toast("Lab reset");
+});
+
+const termIn=document.getElementById("term-in");
+termIn.addEventListener("keydown", e=>{
+  if(e.key==="ArrowUp"){
+    e.preventDefault();
+    if(!lab.history.length) return;
+    lab.histIdx=Math.max(0, (lab.histIdx===-1?lab.history.length:lab.histIdx)-1);
+    termIn.value=lab.history[lab.histIdx]||"";
+  } else if(e.key==="ArrowDown"){
+    e.preventDefault();
+    if(lab.histIdx===-1) return;
+    lab.histIdx++;
+    if(lab.histIdx>=lab.history.length){ lab.histIdx=-1; termIn.value=""; }
+    else termIn.value=lab.history[lab.histIdx];
+  } else if(e.key==="Tab"){
+    e.preventDefault();
+    const v=termIn.value.toLowerCase();
+    const cands=["enable","configure terminal","show running-config","show ip interface brief","show ip route","show vlan brief","show cdp neighbors","interface g0/0","interface g0/1","interface fa0/1","interface fa0/24","no shutdown","ip address","switchport mode access","switchport mode trunk","switchport access vlan","router ospf 1","network","ip route","ping 10.0.12.2","ping 10.0.2.10"];
+    const hit=cands.find(x=>x.startsWith(v) && x!==v);
+    if(hit) termIn.value=hit;
+  } else if(e.key==="Enter"){
+    const raw=termIn.value;
+    print(promptOf()+" "+raw, "cmd");
+    if(raw.trim()){ lab.history.push(raw.trim()); lab.histIdx=-1; }
+    try {
+      const out=handle(raw);
+      if(out) print(out.replace(/\n$/,""), out.trim().startsWith("%")?"err":"");
+    } catch(err){ print("% Simulator error: "+err.message, "err"); }
+    termIn.value="";
+    refreshPrompt();
+  }
+});
+
+banner();
+refreshPrompt();
+renderLabPanel();
+renderAll();
+</script>
+<script>
+/* ===================== CCNA TUTOR LAYER ===================== */
+/* Exam blueprint: CCNA 200-301 v1.1 */
+const DOMAINS = {
+  1:{name:"Network Fundamentals", w:20},
+  2:{name:"Network Access", w:20},
+  3:{name:"IP Connectivity", w:25},
+  4:{name:"IP Services", w:10},
+  5:{name:"Security Fundamentals", w:15},
+  6:{name:"Automation & Programmability", w:10}
+};
+
+/* Syllabus knowledge base, keyed to the 63-day course. [day, domain, concepts, commands, exam traps] */
+const KB = [
+[1,1,"Clients vs servers; switches forward inside a LAN using MAC addresses; routers forward between networks using IP; firewalls filter traffic (stateful, next-gen firewalls add app awareness and IPS).","","Routers separate broadcast domains; switches do not (without VLANs)."],
+[2,1,"Ethernet standards 10BASE-T, 100BASE-TX, 1000BASE-T, 10GBASE-T; UTP twisted pairs; straight-through vs crossover and Auto MDI-X; fiber: single-mode (long, laser) vs multimode (shorter, cheaper, LED/VCSEL); SFP transceivers; IEEE 802.3 naming.","","10/100 use pins 1,2,3,6 only; 1000BASE-T uses all four pairs. Like devices (switch-switch) need crossover without Auto MDI-X."],
+[3,1,"OSI 7 layers vs TCP/IP model; PDUs: data (L5-7), segment (L4), packet (L3), frame (L2), bits (L1); encapsulation and de-encapsulation; same-layer and adjacent-layer interaction.","","Know which layer each device and protocol lives at."],
+[4,1,"IOS modes: user EXEC (>), privileged EXEC (#), global config; enable password vs enable secret (hashed, wins if both set); service password-encryption (weak type 7); running-config (RAM) vs startup-config (NVRAM).","enable; configure terminal; hostname; enable secret; service password-encryption; copy running-config startup-config; write memory; show running-config","enable secret overrides enable password. Type 7 is reversible."],
+[5,1,"Ethernet frame: preamble (7B) + SFD (1B), destination MAC, source MAC, type/length, payload, FCS (CRC). Minimum frame 64 bytes. MAC = 48 bits, first 24 = OUI. Switches learn source MACs, forward known unicast, flood unknown unicast and broadcast.","show mac address-table","Switches learn from SOURCE MAC, forward by DESTINATION MAC."],
+[6,1,"ARP: request is broadcast, reply is unicast; ping uses ICMP echo request/reply; dynamic MAC entries age out after 300 s.","show mac address-table dynamic; clear mac address-table dynamic; show arp; ping","Broadcast MAC is FFFF.FFFF.FFFF."],
+[7,1,"Binary/decimal conversion; IPv4 classes A (1-126), B (128-191), C (192-223), D multicast (224-239), E; network and broadcast addresses; 127.0.0.0/8 loopback.","","Class A default /8, B /16, C /24."],
+[8,1,"Assigning IPv4 addresses to router interfaces; interfaces are shutdown by default on routers; interface status/protocol columns.","interface g0/0; ip address 10.0.0.1 255.255.255.0; no shutdown; description; show ip interface brief; show interfaces","'administratively down' = shutdown. Down/down usually = cable or far end."],
+[9,1,"Speed/duplex autonegotiation; duplex mismatch causes late collisions on the half-duplex side; interface range; error counters: runts (<64B), giants (>1518B), CRC errors.","interface range f0/5-12; speed; duplex; show interfaces status","If autoneg fails, duplex defaults to half at 10/100 Mbps."],
+[10,1,"IPv4 header fields: version, IHL, DSCP/ECN, total length, identification/flags/fragment offset, TTL, protocol (1 ICMP, 6 TCP, 17 UDP, 89 OSPF), header checksum, source, destination.","","TTL decrements per router hop; protocol field identifies the L4/next header."],
+[11,3,"Routing table: connected (C) and local (L /32) routes; longest prefix match wins; static routes by next hop, exit interface, or both; default route 0.0.0.0/0 (gateway of last resort); floating static uses higher AD.","ip route 10.0.2.0 255.255.255.0 10.0.12.2; ip route 0.0.0.0 0.0.0.0 203.0.113.1; show ip route","Most specific match beats lower AD — AD only compares identical prefixes."],
+[12,3,"Life of a packet: each hop ARPs for the next hop; source/destination MACs change per hop; source/destination IPs stay the same (without NAT).","","MACs are rewritten at every router, IPs are not."],
+[13,1,"Subnetting with CIDR: borrow host bits; subnets = 2^borrowed; usable hosts = 2^host-bits − 2; /31 is valid for point-to-point (RFC 3021); /32 is a host route.","","Block size = 256 − interesting-octet mask value."],
+[14,1,"Subnetting Class B/A networks; finding the network, broadcast, first and last host quickly with block sizes.","","Watch which octet is the interesting one."],
+[15,1,"VLSM: assign the largest subnets first, then smaller ones, avoiding overlap.","","Always start VLSM with the biggest host requirement."],
+[16,2,"VLANs split a switch into separate L2 broadcast domains; access ports carry one VLAN; inter-VLAN routing needs a router or L3 switch.","vlan 10; name SALES; interface f0/1; switchport mode access; switchport access vlan 10; show vlan brief","Default VLAN 1; VLANs 1002-1005 are reserved."],
+[17,2,"Trunks carry multiple VLANs with the 802.1Q tag (4 bytes: TPID 0x8100, PCP 3 bits, DEI 1 bit, VID 12 bits); native VLAN is untagged; router-on-a-stick uses subinterfaces.","switchport trunk encapsulation dot1q; switchport mode trunk; switchport trunk allowed vlan 10,20; switchport trunk native vlan 99; interface g0/0.10; encapsulation dot1q 10; show interfaces trunk","Native VLAN mismatch = CDP warning and VLAN leaking. ISL is Cisco-proprietary and obsolete."],
+[18,2,"Native VLAN on a router subinterface; Layer 3 switches: SVIs and routed ports.","encapsulation dot1q 99 native; ip routing; interface vlan 10; no switchport","An SVI is up only if the VLAN exists and at least one port in it is up/up (or trunk forwarding it)."],
+[19,2,"DTP modes: dynamic desirable (actively asks), dynamic auto (passive); auto + auto = access port; disable with nonegotiate. VTP server/client/transparent, revision number, VTPv1/2/3.","switchport nonegotiate; switchport mode dynamic desirable; vtp mode transparent; vtp domain; show vtp status","A switch with a higher VTP revision can overwrite the VLAN database."],
+[20,2,"STP: root bridge = lowest bridge ID (priority + extended system ID (VLAN) + MAC), priority in 4096 steps, default 32768; root ports = lowest root cost; designated ports per segment; costs: 10 Mbps 100, 100 Mbps 19, 1 Gbps 4, 10 Gbps 2.","spanning-tree vlan 10 root primary; spanning-tree vlan 10 priority 4096; show spanning-tree","Tie-breakers: lowest root cost, then lowest neighbor bridge ID, then lowest neighbor port ID."],
+[21,2,"Classic STP states: blocking, listening (15 s), learning (15 s), forwarding; max age 20 s; toolkit: PortFast, BPDU Guard, Root Guard, Loop Guard.","spanning-tree portfast; spanning-tree bpduguard enable; spanning-tree portfast default; spanning-tree guard root","Learning state learns MACs but does not forward frames. BPDU Guard err-disables the port."],
+[22,2,"RSTP (802.1w) roles: root, designated, alternate, backup; states: discarding, learning, forwarding; edge ports; link types point-to-point/shared. Cisco Rapid PVST+.","spanning-tree mode rapid-pvst","Alternate = backup path to root; backup = backup for a shared segment."],
+[23,2,"EtherChannel bundles links: LACP (active/passive, open), PAgP (desirable/auto, Cisco), static on; members must match speed, duplex, VLANs, trunk settings; load balancing by src/dst MAC/IP; L3 EtherChannel.","interface range g0/1-2; channel-group 1 mode active; port-channel load-balance src-dst-ip; show etherchannel summary","passive+passive and auto+auto never form."],
+[24,3,"IGP vs EGP; distance vector vs link state; metrics; administrative distance: connected 0, static 1, eBGP 20, EIGRP 90, OSPF 110, IS-IS 115, RIP 120, iBGP 200; ECMP.","show ip route; show ip protocols","AD chooses between sources; metric chooses within one protocol."],
+[25,3,"RIP: hop count, max 15, updates every 30 s. EIGRP: metric from bandwidth + delay, successor and feasible successor, wildcard masks in network commands (awareness level for v1.1).","router rip; version 2; router eigrp 100","EIGRP AD 90 internal, 170 external."],
+[26,3,"OSPF: link-state, LSDB, SPF (Dijkstra); areas, backbone area 0, ABR, ASBR; router ID: manual > highest loopback > highest physical IP; passive interfaces; default-information originate.","router ospf 1; network 10.0.12.0 0.0.0.3 area 0; router-id 1.1.1.1; passive-interface g0/0; default-information originate; show ip ospf neighbor","RID changes need clear ip ospf process."],
+[27,3,"OSPF cost = reference bandwidth (100 Mbps default) ÷ interface bandwidth; neighbor states Down, Init, 2-Way, ExStart, Exchange, Loading, Full; hello 10 s / dead 40 s on broadcast; interface-level enablement.","auto-cost reference-bandwidth 10000; ip ospf cost 10; ip ospf 1 area 0; show ip ospf interface brief","Default reference makes FastEthernet and faster all cost 1."],
+[28,3,"OSPF network types: broadcast (DR/BDR, highest priority then highest RID, non-preemptive, priority 0 never elected) and point-to-point (no DR). Neighbor requirements: same area, subnet, hello/dead, authentication, MTU, unique RIDs, not passive. LSA types 1, 2, 3.","ip ospf priority 255; ip ospf network point-to-point; show ip ospf database","DROthers stay in 2-Way with each other — that is normal."],
+[29,3,"FHRPs give hosts a virtual default gateway: HSRP (Cisco, active/standby; v1 MAC 0000.0c07.acXX, v2 0000.0c9f.fXXX), VRRP (open standard, master/backup, 0000.5e00.01XX), GLBP (Cisco, load balancing with AVG/AVF). Preemption is off by default in HSRP.","standby 1 ip 10.0.0.254; standby 1 priority 110; standby 1 preempt; show standby","Only GLBP load-balances inside one group."],
+[30,1,"TCP: connection-oriented, 3-way handshake (SYN, SYN-ACK, ACK), sequencing, ACKs, windowing, FIN teardown; UDP: connectionless. Ports: FTP 20/21, SSH 22, Telnet 23, SMTP 25, DNS 53, DHCP 67/68, TFTP 69, HTTP 80, POP3 110, NTP 123, SNMP 161/162, HTTPS 443, Syslog 514.","","DNS uses UDP 53 for queries and TCP 53 for large responses/zone transfers."],
+[31,1,"IPv6: 128 bits in hex; shorten by removing leading zeros and replacing one run of zero groups with ::; /64 standard LAN prefix.","ipv6 unicast-routing; ipv6 address 2001:db8:0:1::1/64; show ipv6 interface brief",":: can appear only once."],
+[32,1,"EUI-64 (split MAC, insert FFFE, flip 7th bit); address types: global unicast 2000::/3, unique local FC00::/7 (FD in practice), link-local FE80::/10, multicast FF00::/8 (FF02::1 all nodes, FF02::2 all routers, FF02::5 OSPF, FF02::A EIGRP), anycast; no broadcast in IPv6.","ipv6 address 2001:db8:1::/64 eui-64; ipv6 address fe80::1 link-local","Flipping the 7th bit of 00 gives 02."],
+[33,1,"NDP replaces ARP: NS/NA, RS/RA (ICMPv6); solicited-node multicast FF02::1:FFxx:xxxx; SLAAC; DAD. IPv6 static routes; a link-local next hop requires the exit interface.","ipv6 route 2001:db8:2::/64 g0/0 fe80::2; ipv6 route ::/0 2001:db8:12::2; ipv6 address autoconfig","IPv6 routing is off until ipv6 unicast-routing."],
+[34,5,"Standard ACLs (1-99, 1300-1999) match source only; place close to destination; top-down processing, first match wins, implicit deny any; wildcard masks; named ACLs with sequence numbers; one ACL per interface per direction.","access-list 1 permit 10.0.0.0 0.0.0.255; ip access-list standard BLOCK; ip access-group 1 out; show access-lists","An ACL with only deny lines blocks everything."],
+[35,5,"Extended ACLs (100-199, 2000-2699) match protocol, source, destination and ports (eq, gt, lt, neq, range); place close to source.","access-list 100 deny tcp 10.0.1.0 0.0.0.255 host 10.0.2.10 eq 80; access-list 100 permit ip any any","Port operators go after the address they apply to."],
+[36,2,"CDP (Cisco, timer 60 s, holdtime 180 s) and LLDP (IEEE 802.1AB, 30 s / 120 s) discover directly connected neighbors.","cdp run; no cdp enable; lldp run; lldp transmit; lldp receive; show cdp neighbors detail; show lldp neighbors","LLDP is disabled by default on Cisco IOS; CDP is enabled."],
+[37,4,"NTP: stratum levels (lower is closer to reference), client/server, NTP master, authentication; hardware clock vs software clock.","ntp server 10.0.0.1; ntp master 3; clock timezone; show ntp associations; show clock detail","NTP uses UDP 123."],
+[38,4,"DNS resolves names: A (IPv4), AAAA (IPv6), CNAME; recursive vs iterative; router as client/server.","ip name-server 8.8.8.8; ip domain lookup; ip host SERVER1 10.0.0.10","Hosts cache DNS results."],
+[39,4,"DHCP DORA (Discover, Offer, Request, Ack); pools, excluded addresses, default router, DNS; relay agent forwards broadcasts as unicast.","ip dhcp excluded-address 10.0.0.1 10.0.0.10; ip dhcp pool LAN; network 10.0.0.0 255.255.255.0; default-router 10.0.0.1; ip helper-address 10.0.99.5; ip address dhcp","ip helper-address goes on the interface facing the CLIENTS."],
+[40,4,"SNMP: manager and agents, MIB and OIDs; Get/GetNext/GetBulk/Set, Trap (no ack) and Inform (ack); v1/v2c community strings, v3 authentication and encryption; UDP 161 agent, 162 manager.","snmp-server community NMS-RO ro; snmp-server host","Only SNMPv3 provides authentication and encryption."],
+[41,4,"Syslog severities: 0 Emergency, 1 Alert, 2 Critical, 3 Error, 4 Warning, 5 Notification, 6 Informational, 7 Debugging; destinations console, buffer, VTY, server.","logging console 6; logging buffered; logging host 10.0.0.50; logging synchronous; terminal monitor","Mnemonic: Every Awesome Cisco Engineer Will Need Ice cream Daily."],
+[42,4,"SSH v2 replaces Telnet; needs hostname + domain name + RSA keys; VTY lines with local login; restrict with access-class.","ip domain name lab.local; crypto key generate rsa modulus 2048; ip ssh version 2; username admin secret x; line vty 0 15; login local; transport input ssh; access-class 1 in","SSHv2 needs a 768-bit or larger key."],
+[43,4,"TFTP (UDP 69, no authentication, lock-step) vs FTP (TCP 20/21, active vs passive); copying IOS images and upgrading with boot system.","copy tftp: flash:; boot system flash:image.bin; show flash","TFTP has no authentication or directory listing."],
+[44,4,"Private ranges 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16; static NAT one-to-one; inside local, inside global, outside local, outside global.","ip nat inside; ip nat outside; ip nat inside source static 10.0.0.10 203.0.113.10; show ip nat translations","Inside local = private address of the inside host."],
+[45,4,"Dynamic NAT from a pool; PAT (NAT overload) many-to-one using ports; an ACL selects inside local addresses.","access-list 1 permit 10.0.0.0 0.0.0.255; ip nat pool P 203.0.113.1 203.0.113.5 netmask 255.255.255.248; ip nat inside source list 1 interface g0/1 overload; clear ip nat translation *","The ACL is just a match list — it does not filter traffic here."],
+[46,4,"Voice VLANs and PoE; QoS need: delay, jitter, loss (voice targets ~150 ms one-way, 30 ms jitter, 1% loss); queuing and tail drop.","switchport voice vlan 20; power inline","A voice VLAN port stays an access port."],
+[47,4,"Classification and marking: 802.1p PCP/CoS (3 bits), DSCP (6 bits): EF 46, AF classes, CS; trust boundaries; LLQ/CBWFQ; policing (drops) vs shaping (buffers); WRED.","","EF (46) is for voice."],
+[48,5,"CIA triad; vulnerability vs exploit vs threat; DoS/DDoS, spoofing, reflection/amplification, MITM, reconnaissance, malware, social engineering, password attacks; MFA; AAA: TACACS+ (TCP 49, encrypts whole payload, Cisco) vs RADIUS (UDP 1812/1813, encrypts password only); 802.1X roles supplicant, authenticator, authentication server; security programs (awareness, training, physical access).","aaa new-model","TACACS+ separates authentication, authorization and accounting."],
+[49,5,"Port security limits MACs per port; violation modes shutdown (default, err-disable), restrict (drops + logs), protect (drops silently); sticky learning; errdisable recovery.","switchport port-security; switchport port-security maximum 2; switchport port-security violation restrict; switchport port-security mac-address sticky; show port-security interface f0/1; errdisable recovery cause psecure-violation","Port security can't be enabled on a dynamic (DTP) port."],
+[50,5,"DHCP snooping: trusted (toward real server) vs untrusted ports; drops server messages on untrusted ports; builds the binding table; rate limiting; Option 82 considerations.","ip dhcp snooping; ip dhcp snooping vlan 10; ip dhcp snooping trust; ip dhcp snooping limit rate 10; no ip dhcp snooping information option","Nothing is trusted by default."],
+[51,5,"Dynamic ARP Inspection validates ARP against the DHCP snooping binding table; trusted/untrusted ports; optional validation of src-mac, dst-mac, ip; default 15 pps limit on untrusted ports.","ip arp inspection vlan 10; ip arp inspection trust; ip arp inspection validate src-mac dst-mac ip","DAI depends on DHCP snooping (or ARP ACLs for static hosts)."],
+[52,1,"LAN architectures: two-tier (collapsed core), three-tier (access/distribution/core), spine-leaf for data centers, SOHO; star, full and partial mesh; PoE.","","In spine-leaf, every leaf connects to every spine and leaves never connect to each other."],
+[53,1,"WAN: leased lines, MPLS (CE, PE, P; L3VPN), Internet access (DSL, cable, fiber, 4G/5G); VPNs: site-to-site IPsec, GRE over IPsec, DMVPN, remote-access TLS VPN.","","GRE alone does not encrypt."],
+[54,1,"Virtualization: type 1 (bare metal) vs type 2 hypervisors; VMs vs containers (Docker, Kubernetes orchestration); cloud: NIST characteristics, IaaS/PaaS/SaaS, public/private/hybrid/community; VRFs create separate routing tables on one router.","ip vrf CUSTOMER1; ip vrf forwarding CUSTOMER1; show ip route vrf CUSTOMER1","Applying VRF to an interface removes its IP address."],
+[55,1,"Wireless: IEEE 802.11 a/b/g/n/ac/ax; 2.4 GHz non-overlapping channels 1, 6, 11; 5 GHz and 6 GHz; SSID vs BSSID; BSS, ESS, IBSS; CSMA/CA; RF concepts (amplitude, frequency, absorption, reflection).","","Wi-Fi uses CSMA/CA, not CSMA/CD."],
+[56,2,"Wireless architectures: autonomous APs, lightweight APs with a WLC via CAPWAP (UDP 5246 control, 5247 data), split-MAC, cloud-based; AP modes (local, FlexConnect, monitor, sniffer, bridge); WLC ports and LAG.","","CAPWAP control is encrypted with DTLS; data is optional."],
+[57,5,"Wireless security: open, WEP (broken), WPA, WPA2 (CCMP/AES), WPA3 (SAE for personal, GCMP, PMF); personal PSK vs enterprise 802.1X/EAP (LEAP, EAP-FAST, PEAP, EAP-TLS).","","EAP-TLS needs certificates on both client and server."],
+[58,5,"Configuring a WLAN on a WLC GUI: create WLAN, map to a dynamic interface/VLAN, WPA2-PSK or WPA3 settings, QoS profile (Platinum for voice).","","The exam tests GUI workflow, not WLC CLI."],
+[59,6,"Automation benefits; planes: data (forwarding), control (routing protocols, ARP, STP), management (SSH, SNMP); controller-based networking with northbound (to apps) and southbound (to devices) interfaces.","","Routing protocol exchanges belong to the control plane."],
+[60,6,"Data formats: JSON (string, number, boolean, null, object, array), XML, YAML; reading key-value structures.","","JSON keys must be double-quoted strings."],
+[61,6,"REST APIs: CRUD maps to POST (create), GET (read), PUT/PATCH (update), DELETE; status codes 2xx success (200, 201), 4xx client (400, 401, 403, 404), 5xx server; REST constraints: client-server, stateless, cacheable, uniform interface, layered, code-on-demand; API auth.","","401 = not authenticated; 403 = authenticated but not allowed."],
+[62,6,"SDN: Cisco SD-Access (underlay, VXLAN/LISP overlay, fabric; managed by Catalyst Center, formerly DNA Center), traditional vs controller-based management, SD-WAN.","","Catalyst Center exposes REST northbound APIs."],
+[63,6,"Configuration management: Ansible (agentless, push, SSH, YAML playbooks), Puppet (agent pull, manifests), Chef (agent pull, recipes/cookbooks), Terraform (declarative IaC, HCL). v1.1 adds awareness of AI/ML in network operations (predictive vs generative). Mega Lab review.","","Ansible is the only agentless one of the three classic tools."]
+];
+const KB_BY_DAY = Object.fromEntries(KB.map(k => [k[0], {n:k[0], d:k[1], c:k[2], cmd:k[3], trap:k[4]}]));
+
+/* Resource catalog (all links the study plan uses) */
+const RES = [
+  {g:"Jeremy’s IT Lab", items:[
+    ["YouTube channel","https://www.youtube.com/@JeremysITLab"],
+    ["Free CCNA v1.1 200-301 complete course (2026 playlist)","https://www.youtube.com/playlist?list=PLxbwE86jKRgMpuZuLBivzlM8s2Dk5lXBQ"],
+    ["Channel courses page","https://www.youtube.com/@JeremysITLab/courses"],
+    ["Extra Packet Tracer labs playlist","https://www.youtube.com/playlist?list=PLxbwE86jKRgMQ4HTuaJ7yQgA2BoNwY9ct"],
+    ["Paid JITL Academy (official slides)","https://courses.jeremysitlab.com/p/ccna"],
+    ["Anki + Packet Tracer lab files","https://jitl.jp/ccna-files"],
+    ["Same files via SendFox signup","https://sendfox.com/jeremysitlab"],
+    ["Packet Tracer pointer","https://jitl.jp/packet-tracer"],
+    ["Anki app","https://apps.ankiweb.net/"],
+    ["Shared JITL Anki deck","https://ankiweb.net/shared/info/371748874"]]},
+  {g:"Boson", items:[
+    ["ExSim-Max for 200-301","https://boson.com/product/exsim-max-for-cisco-200-301-ccna/"],
+    ["Jeremy’s ExSim link","https://jitl.jp/ccna-exsim"],
+    ["Jeremy’s NetSim link","https://jitl.jp/ccna-netsim"],
+    ["ExSim + NetSim bundle","https://jitl.jp/ccna-kit"],
+    ["Boson courseware via Jeremy","https://jitl.jp/ccna-courseware"],
+    ["Boson CCNA overview","https://www.boson.com/certifications/ccna/"],
+    ["ExSim-Max practice exams","https://boson.com/exsim-max-practice-exams/"],
+    ["Bundles","https://boson.com/product-bundles/"],
+    ["Guarantee","https://boson.com/guarantee"]]},
+  {g:"Notes and community", items:[
+    ["Reddit compiled notes thread","https://www.reddit.com/r/ccna/comments/1gbxbsi/course_notes_pdf_from_jeremys_it_lab_200301/"],
+    ["Same thread (old.reddit)","https://old.reddit.com/r/ccna/comments/1gbxbsi/course_notes_pdf_from_jeremys_it_lab_200301/"],
+    ["Notes PDF download (from that thread)","https://drive.google.com/uc?export=download&id=1xB3W0yHjSJp6D63bpiqDnHkkces9Pq_N"],
+    ["Per-day Markdown notes (psaumur)","https://github.com/psaumur/CCNA_Course_Notes"],
+    ["Community Anki/lab mirror","https://github.com/g-h-97/JeremyITLab-CCNA"],
+    ["r/ccna","https://www.reddit.com/r/ccna/"],
+    ["Shared 200-301 course notes post","https://www.reddit.com/r/ccna/comments/1dg025j/sharing_my_ccna_200301_course_notes/"],
+    ["Jeremy’s notes in PDF post","https://www.reddit.com/r/ccna/comments/1q4y47f/jeremys_200301_notes_in_pdf_format/"]]},
+  {g:"Cisco official", items:[
+    ["CCNA certification page","https://www.cisco.com/site/us/en/learn/training-certifications/certifications/enterprise/ccna/index.html"],
+    ["Cisco Learning Network — CCNA","https://learningnetwork.cisco.com/s/ccna"],
+    ["Packet Tracer (NetAcad)","https://www.netacad.com/courses/packet-tracer"],
+    ["Book the exam (Pearson VUE)","https://home.pearsonvue.com/cisco"]]},
+  {g:"Other references", items:[
+    ["Course archive mirror","https://archive.org/details/jeremys-it-lab-ccna-200-301-complete-course"],
+    ["Course review (ccnatraining.com)","https://ccnatraining.com/jeremys-it-lab-ccna-course-review-the-best-free-resource-in-the-game-with-one-catch/"],
+    ["Course listing (electronicszone)","https://electronicszone.net/courses/free-ccna-v11-200-301-complete-course-2025-by-jeremys-it-lab/"],
+    ["Packet Tracer labs collection","https://www.netpilot.io/blog/cisco-packet-tracer-labs-collection"]]}
+];
+/* Per-day video extras */
+const DAY_EXTRA = {
+  1:{lab:"https://www.youtube.com/watch?v=a1Im6GYaSno", anki:"https://www.youtube.com/watch?v=6Atw8oMtVTA"},
+  2:{lab:"https://www.youtube.com/watch?v=K6Qt23sY68Y"},
+  3:{lab:"https://www.youtube.com/watch?v=7nmYoL0t2tU"},
+  4:{lab:"https://www.youtube.com/watch?v=SDocmq1c05s"},
+  6:{lab:"https://www.youtube.com/watch?v=Ig0dSaOQDI8"},
+  8:{lab:"https://www.youtube.com/watch?v=e1jbvyMeS5I"},
+  11:{lab:"https://www.youtube.com/watch?v=YCv4-_sMvYE"},
+  59:{yt:"https://www.youtube.com/watch?v=4tsBgMCPVuc"},
+  60:{yt:"https://www.youtube.com/watch?v=nohde2-QNJ4"},
+  61:{yt:"https://www.youtube.com/watch?v=Luei0p-2h10"}
+};
+DAYS.forEach(d => { const x = DAY_EXTRA[d.n]; if (x) Object.assign(d.links, x); });
+/* Exact per-day file in the psaumur/CCNA_Course_Notes repo (mapped from each file's day heading) */
+const NOTES_BASE = "https://github.com/psaumur/CCNA_Course_Notes/blob/main/Course_Notes/";
+const NOTES_FILES = {1:["Network_Devices"],2:["Interfaces_and_Cables"],3:["OSI_Model_TCPSuite"],4:["Intro_to_CLI"],5:["Ethernet_LAN_Switching_Part1"],6:["Ethernet_LAN_Switching_Part2"],7:["IPv4_Addressing_Part1"],8:["IPv4_Addressing_Part2"],9:["Switch_Interfaces"],10:["The_IPv4_Header"],11:["Routing_Fundamentals_Part1", "Static_Routing_Part2"],12:["Life_of_a_Packet"],13:["Subnetting_Part1"],14:["Subnetting_Part2"],15:["Subnetting_VLSM_Part3"],16:["VLAN_Part1"],17:["VLAN_Part2"],18:["VLAN_Part3"],19:["DTP_VTP"],20:["Spanning_Tree_Protocol_Part1"],21:["Spanning_Tree_Protocol_Part2"],22:["Rapid_Spanning_Tree_Protocol"],23:["Etherchannel"],24:["DynamicRouting"],25:["RIP_and_EIGRP"],26:["OSPF_Part1"],27:["OSPF_Part2"],28:["OSPF_Part3"],29:["First_Hop_Redundancy_Protocols"],30:["TCP_and_UDP"],31:["IPv6_Part1"],32:["IPv6_Part2"],33:["IPv6_Part3"],34:["Standard_Access_Control_Lists"],35:["Extended_Access_Control_Lists"],36:["CDP_and_LLDP"],37:["NTP"],38:["DNS"],39:["DHCP"],40:["SNMP"],41:["SYSLOG"],42:["SSH"],43:["FTP_and_TFTP"],44:["NAT_Static_Part1"],45:["NAT_Dynamic_Part2"],46:["QoS_VoiceLan"],47:["QoS_Quality_of_Service"],48:["Security_Fundamentals"],49:["Port_Security"],50:["DHCP_Snooping"],51:["Dynamic_Arp_Inspection"],52:["LAN_Architectures"],53:["WAN_Architectures"],54:["Virtualizations_and_Cloud_Part1", "Virtualization_Containers", "Virtualization_VRF_Part3"],55:["Wireless_Fundamentals"],56:["Wireless_Architecutres"],57:["Wireless_Security"],58:["Wireless_Configuration"],59:["Introduction_to_Network_Automation"],60:["JSON_XML_YAML"],61:["REST_APIs"],62:["Software_Defined_Networking"],63:["Ansible_Puppet_Chef"]};
+DAYS.forEach(d => { d.links.notes = (NOTES_FILES[d.n] || []).map(f => NOTES_BASE + f + ".md"); });
+function notesLinks(n){ const l = DAYS[n-1].links.notes || []; return l.map((u,i) => [l.length > 1 ? `Notes part ${i+1}` : "Day notes", u]); }
+const PLAYLIST = "https://www.youtube.com/playlist?list=PLxbwE86jKRgMpuZuLBivzlM8s2Dk5lXBQ";
+
+/* Built-in question bank (works with no AI) */
+const QB = [
+{id:"b1",d:1,day:3,q:"Which PDU name belongs to OSI Layer 4?",o:["Frame","Packet","Segment","Bits"],a:2,why:"Layer 4 (Transport) PDUs are segments (TCP) or datagrams (UDP). Packets are L3, frames are L2."},
+{id:"b2",d:1,day:13,q:"What is the network address of 192.168.10.77/27?",o:["192.168.10.64","192.168.10.72","192.168.10.96","192.168.10.0"],a:0,why:"/27 = block size 32 in the last octet: 0, 32, 64, 96. 77 falls in 64–95."},
+{id:"b3",d:1,day:13,q:"How many usable hosts does a /26 provide?",o:["30","62","64","126"],a:1,why:"32 − 26 = 6 host bits. 2^6 − 2 = 62."},
+{id:"b4",d:1,day:32,q:"Which prefix identifies IPv6 link-local addresses?",o:["FC00::/7","FF00::/8","2000::/3","FE80::/10"],a:3,why:"Link-local is FE80::/10. FC00::/7 is unique local, FF00::/8 multicast, 2000::/3 global unicast."},
+{id:"b5",d:1,day:10,q:"Which IPv4 protocol number identifies OSPF?",o:["6","17","89","88"],a:2,why:"OSPF runs directly over IP as protocol 89. 6 = TCP, 17 = UDP, 88 = EIGRP."},
+{id:"b6",d:1,day:31,q:"Which is the correct shortest form of 2001:0db8:0000:0000:0000:ff00:0042:8329?",o:["2001:db8::ff00:42:8329","2001:db8:0::ff00:0042:8329","2001:db8::ff00::42:8329","2001:0db8::ff:42:8329"],a:0,why:"Drop leading zeros in each group and replace the single run of zero groups with ::. :: may appear only once."},
+{id:"b7",d:1,day:30,q:"Which transport and port does SSH use?",o:["UDP 22","TCP 23","TCP 22","TCP 443"],a:2,why:"SSH = TCP 22. Telnet = TCP 23."},
+{id:"b8",d:2,day:20,q:"What is the default STP bridge priority on a Cisco switch?",o:["4096","32768","65535","0"],a:1,why:"Default is 32768; with the extended system ID the displayed value is 32768 + VLAN ID."},
+{id:"b9",d:2,day:19,q:"Both ends of a link are set to dynamic auto. What results?",o:["Trunk","Access port","err-disabled","Trunk with native VLAN 1 only"],a:1,why:"Dynamic auto only responds to DTP; neither side initiates, so the link stays an access port."},
+{id:"b10",d:2,day:17,q:"How many bits is the VLAN ID field in an 802.1Q tag?",o:["8","10","12","16"],a:2,why:"VID is 12 bits (0–4095). The whole tag is 4 bytes."},
+{id:"b11",d:2,day:23,q:"Which LACP mode pair will form an EtherChannel?",o:["passive / passive","active / passive","auto / desirable","on / active"],a:1,why:"LACP forms with active/active or active/passive. auto/desirable is PAgP. on only works with on."},
+{id:"b12",d:2,day:21,q:"In classic STP, which port state learns MAC addresses but does not forward frames?",o:["Listening","Blocking","Learning","Disabled"],a:2,why:"Learning populates the MAC table for 15 s before forwarding."},
+{id:"b13",d:2,day:56,q:"Which UDP port does CAPWAP use for control messages?",o:["5246","5247","1812","69"],a:0,why:"CAPWAP control = UDP 5246 (DTLS-encrypted); data = UDP 5247."},
+{id:"b14",d:3,day:24,q:"What is the administrative distance of OSPF?",o:["90","100","110","120"],a:2,why:"OSPF 110. EIGRP internal 90, RIP 120, static 1."},
+{id:"b15",d:3,day:11,q:"A router has 10.0.0.0/8, 10.1.0.0/16, 10.1.1.0/24 and 0.0.0.0/0. Which route does 10.1.1.5 use?",o:["10.0.0.0/8","10.1.0.0/16","10.1.1.0/24","0.0.0.0/0"],a:2,why:"Longest prefix match: the /24 is the most specific route containing the destination."},
+{id:"b16",d:3,day:26,q:"What does OSPF use first to choose its router ID?",o:["Highest physical interface IP","Highest loopback IP","Manually configured router-id","Lowest MAC address"],a:2,why:"Order: router-id command > highest loopback IP > highest active physical IP."},
+{id:"b17",d:3,day:28,q:"Two OSPF routers on a broadcast segment have equal priority. What elects the DR?",o:["Lowest router ID","Highest router ID","Lowest interface IP","First router to boot, always"],a:1,why:"Highest priority wins, then highest RID. (Election is non-preemptive, so an existing DR keeps its role.)"},
+{id:"b18",d:3,day:11,q:"What makes a static route a floating static route?",o:["It uses an exit interface","Its AD is higher than the primary route","It points to 0.0.0.0/0","It has a /32 mask"],a:1,why:"A higher AD keeps it out of the table until the preferred route disappears."},
+{id:"b19",d:3,day:29,q:"Which FHRP is an open standard?",o:["HSRP","GLBP","VRRP","CDP"],a:2,why:"VRRP is IETF standard. HSRP and GLBP are Cisco-proprietary."},
+{id:"b20",d:4,day:39,q:"What is the correct order of DHCP messages?",o:["Request, Offer, Discover, Ack","Discover, Offer, Request, Ack","Discover, Request, Offer, Ack","Offer, Discover, Ack, Request"],a:1,why:"DORA: Discover, Offer, Request, Acknowledge."},
+{id:"b21",d:4,day:39,q:"Which command lets a router forward client DHCP broadcasts to a server on another subnet?",o:["ip dhcp relay","ip helper-address","ip forward-protocol dhcp","dhcp server"],a:1,why:"ip helper-address on the client-facing interface makes the router a relay agent."},
+{id:"b22",d:4,day:41,q:"Which syslog severity level is 4?",o:["Error","Notification","Warning","Critical"],a:2,why:"0 Emergency, 1 Alert, 2 Critical, 3 Error, 4 Warning, 5 Notification, 6 Informational, 7 Debugging."},
+{id:"b23",d:4,day:44,q:"In NAT terminology, the private IP of an inside host is called:",o:["Inside global","Inside local","Outside local","Outside global"],a:1,why:"Inside local = inside host's address as seen on the inside network."},
+{id:"b24",d:4,day:47,q:"What DSCP value is Expedited Forwarding (EF)?",o:["26","34","46","48"],a:2,why:"EF = 46, used for voice. CS6 = 48."},
+{id:"b25",d:4,day:40,q:"Which SNMP message is acknowledged by the manager?",o:["Trap","Inform","Get","Set"],a:1,why:"Informs are acknowledged; Traps are not."},
+{id:"b26",d:5,day:49,q:"What is the default port-security violation mode?",o:["protect","restrict","shutdown","log"],a:2,why:"Default is shutdown, which err-disables the port."},
+{id:"b27",d:5,day:48,q:"Which AAA protocol uses TCP 49 and encrypts the entire payload?",o:["RADIUS","TACACS+","Kerberos","LDAP"],a:1,why:"TACACS+ (TCP 49) encrypts the whole body. RADIUS (UDP 1812/1813) only encrypts the password."},
+{id:"b28",d:5,day:34,q:"Where should a standard ACL generally be placed?",o:["Close to the source","Close to the destination","On every interface","Only on VTY lines"],a:1,why:"Standard ACLs match only source, so placing them near the destination avoids blocking other traffic."},
+{id:"b29",d:5,day:51,q:"Dynamic ARP Inspection validates ARP packets against:",o:["The MAC address table","The CAM aging timer","The DHCP snooping binding table","The routing table"],a:2,why:"DAI uses DHCP snooping bindings (IP–MAC–port–VLAN)."},
+{id:"b30",d:5,day:57,q:"Which method does WPA3-Personal use to replace PSK's 4-way handshake weakness?",o:["TKIP","SAE","LEAP","WEP"],a:1,why:"Simultaneous Authentication of Equals (SAE) protects against offline dictionary attacks."},
+{id:"b31",d:5,day:34,q:"What wildcard mask matches the subnet 255.255.255.240?",o:["0.0.0.15","0.0.0.16","0.0.0.240","255.255.255.15"],a:0,why:"Wildcard = 255.255.255.255 − mask = 0.0.0.15."},
+{id:"b32",d:6,day:63,q:"Which configuration tool is agentless and uses YAML playbooks over SSH?",o:["Puppet","Chef","Ansible","SaltStack master/minion"],a:2,why:"Ansible pushes over SSH with no agent. Puppet and Chef use agents."},
+{id:"b33",d:6,day:61,q:"In REST, which HTTP method maps to Create?",o:["GET","POST","PUT","DELETE"],a:1,why:"CRUD → POST, GET, PUT/PATCH, DELETE."},
+{id:"b34",d:6,day:61,q:"What does HTTP 403 mean?",o:["Not found","Not authenticated","Authenticated but not permitted","Server error"],a:2,why:"403 Forbidden. 401 = not authenticated, 404 = not found."},
+{id:"b35",d:6,day:59,q:"OSPF hello exchanges belong to which plane?",o:["Data plane","Control plane","Management plane","Application plane"],a:1,why:"Routing protocols build the forwarding info — control plane."},
+{id:"b36",d:6,day:60,q:"Which of these is NOT a JSON data type?",o:["boolean","null","array","tuple"],a:3,why:"JSON types: string, number, boolean, null, object, array."}
+];
+
+/* ---------- state extensions ---------- */
+function ensureState(){
+  if (!state.quiz) state.quiz = {};
+  const q = state.quiz;
+  q.dom ||= {}; q.box ||= {}; q.gen ||= []; q.log ||= []; q.seen ||= 0;
+  Object.keys(DOMAINS).forEach(k => { q.dom[k] ||= {c:0,t:0}; });
+  state.subnet ||= {c:0, t:0, streak:0, best:0};
+}
+ensureState();
+
+const TUTOR_KEY = "ccna-lockstep-tutor-v1";
+let tutor = (() => { try { return JSON.parse(localStorage.getItem(TUTOR_KEY)) || {turns:[]}; } catch { return {turns:[]}; } })();
+function saveTutor(){ try { tutor.turns = tutor.turns.slice(-24); localStorage.setItem(TUTOR_KEY, JSON.stringify(tutor)); } catch {} }
+
+/* Make saves safe + stamp for sync */
+const _origSave = save;
+save = function(s){ s._t = Date.now(); try { _origSave(s); } catch {} queueSync(); };
+const _origRenderAll = renderAll;
+renderAll = function(){ ensureState(); _origRenderAll(); renderMastery(); renderFocus(); };
+
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function currentDay(){ return DAYS.find(d => !dayComplete(d)) || DAYS[DAYS.length-1]; }
+function pct(o){ return o.t ? Math.round(o.c/o.t*100) : null; }
+
+/* Boson weak-domain text → exam domains */
+const WEAK_MAP = [
+  [/ospf|static|route|routing|fhrp|hsrp|vrrp|glbp|eigrp|rip|longest/i,3],
+  [/vlan|trunk|stp|spanning|etherchannel|lacp|dtp|vtp|cdp|lldp|wlc|capwap|switch/i,2],
+  [/acl|port.?sec|snooping|arp insp|dai|aaa|tacacs|radius|wpa|security|802\.1x|vpn/i,5],
+  [/nat|pat|dhcp|dns|ntp|snmp|syslog|ssh|qos|dscp|tftp|ftp/i,4],
+  [/rest|json|api|ansible|puppet|chef|sdn|automation|yaml|xml|dna|catalyst center/i,6],
+  [/subnet|ipv6|ipv4|osi|tcp|udp|cable|wireless|cloud|virtual|header|ethernet/i,1]
+];
+function bosonWeakDomains(){
+  const hits = {};
+  state.boson.slice(-6).forEach(b => {
+    const t = (b.weak||"") + " " + (b.notes||"");
+    WEAK_MAP.forEach(([re,d]) => { if (re.test(t)) hits[d] = (hits[d]||0)+1; });
+  });
+  return hits;
+}
+function weakDomains(){
+  const q = state.quiz.dom, bw = bosonWeakDomains();
+  return Object.keys(DOMAINS).map(k => {
+    const p = pct(q[k]);
+    let score = 0;
+    if (p !== null && q[k].t >= 4) score += (100 - p);
+    else score += 35; // untested counts as moderately weak
+    score += (bw[k]||0) * 20;
+    score *= (0.6 + DOMAINS[k].w/50);
+    return {d:+k, score, p, t:q[k].t, boson:bw[k]||0};
+  }).sort((a,b) => b.score - a.score);
+}
+
+/* ---------- mastery + focus (dashboard & quiz) ---------- */
+function masteryHTML(){
+  return Object.entries(DOMAINS).map(([k,D]) => {
+    const s = state.quiz.dom[k], p = pct(s);
+    const col = p === null ? "var(--line)" : p >= 85 ? "var(--good)" : p >= 70 ? "var(--accent2)" : p >= 50 ? "var(--warn)" : "var(--bad)";
+    return `<div class="m-row"><div class="m-lab"><span>${k}.0 ${D.name}</span><span class="tiny">${p===null?"not tested":p+"% of "+s.t}<span class="m-w">${D.w}% of exam</span></span></div>
+      <div class="bar"><i style="width:${p??0}%;background:${col}"></i></div></div>`;
+  }).join("");
+}
+function renderMastery(){
+  ["mastery-d","mastery-q"].forEach(id => { const el = $(id); if (el) el.innerHTML = masteryHTML(); });
+  const info = $("quiz-bank-info");
+  if (info) info.textContent = `${QB.length} built-in + ${state.quiz.gen.length} AI-generated questions · ${state.quiz.seen} answered`;
+}
+function renderFocus(){
+  const el = $("focus-list"); if (!el) return;
+  const cd = currentDay(), kb = KB_BY_DAY[cd.n], w = weakDomains().slice(0,2);
+  el.innerHTML = `
+    <p><b>Learn:</b> Day ${cd.n} · ${esc(cd.title)} <span class="tiny">(${DOMAINS[kb.d].name})</span></p>
+    <p class="tiny">${esc(kb.trap)}</p>
+    <p><b>Shore up:</b> ${w.map(x => `${DOMAINS[x.d].name}${x.p!==null?` (${x.p}%)`:""}${x.boson?" · flagged in Boson":""}`).join(" and ")}</p>
+    <div class="row" style="margin-top:8px">
+      <button class="btn" data-go="plan-session">Plan my session</button>
+      <button class="btn ghost" data-go="quiz-weak">Quiz my weak spots</button>
+    </div>`;
+}
+document.addEventListener("click", e => {
+  const go = e.target.closest("[data-go]")?.dataset.go; if (!go) return;
+  if (go === "plan-session") askTutor("Plan today's study session for me (about 60–90 minutes) using my current day and weak areas. Give a timed checklist.");
+  if (go === "quiz-weak") { openView("quiz"); $("quiz-scope").value = "adaptive"; nextQuestion(); }
+  if (go.startsWith("ask-day-")) { const n = +go.slice(8); $("tutor-day").value = n; askTutor(`Teach me Day ${n} (${DAYS[n-1].title}) — core ideas, the commands, and what the exam likes to trick people on. End with one check question.`); }
+  if (go.startsWith("quiz-day-")) { const n = +go.slice(9); openView("quiz"); $("quiz-scope").value = "day:"+n; generateQuiz(); }
+});
+function openView(v){ document.querySelector(`.tab[data-view="${v}"]`)?.click(); window.scrollTo({top:0}); }
+
+/* ---------- AI (claude.ai sample capability) ---------- */
+let sample = null, aiReady = false, aiDenied = false;
+const AI_ERR = {
+  not_granted:"AI answers were declined for this visit. Reload the page to be asked again.",
+  rate_limited:"Too many requests in a row. Wait a minute, then ask again.",
+  prompt_too_large:"That request was too long. Start a new chat or ask something shorter.",
+  refused:"The tutor declined that request. Rephrase it as a CCNA question.",
+  empty_completion:"The tutor returned nothing. Ask again.",
+  invalid_json:"The generated questions came back malformed. Try Generate again.",
+  session_expired:"Your claude.ai session expired. Reload the page and sign in.",
+  sampling_disabled:"AI answers are turned off for this account.",
+  passcode:"Enter the tutor passcode (Tutor tab) to use AI features.",
+  ai_not_configured:"The server has no Anthropic API key set yet.",
+  network:"Can't reach the server. Check your connection and try again.",
+  upstream:"The Claude API returned an error. Try again in a moment.",
+};
+function aiErr(e){ return AI_ERR[e?.code] || "The tutor could not answer right now. Try again in a moment."; }
+function setAIStatus(){
+  const msg = aiReady ? "" : aiDenied ? AI_ERR.not_granted : "The AI tutor needs claude.ai or the Render server with an API key. Quizzes, subnet drills and the CLI lab work anywhere.";
+  document.querySelectorAll("[data-ai-status]").forEach(el => el.textContent = msg);
+  document.querySelectorAll("[data-ai]").forEach(el => el.disabled = !aiReady);
+}
+/* Self-hosted mode (e.g. Render): the page's own server proxies Claude at /api/sample */
+const PASS_KEY = "ccna-lockstep-passcode";
+let backendMode = false;
+const getPass = () => { try { return localStorage.getItem(PASS_KEY) || ""; } catch { return ""; } };
+function showPassBox(show){ $("pass-box")?.classList.toggle("hidden", !show); }
+function makeRemoteSample(){
+  const call = async (body, signal) => {
+    let r;
+    try {
+      r = await fetch("/api/sample", {method:"POST", signal, body:JSON.stringify(body),
+        headers:{"Content-Type":"application/json", "X-App-Passcode":getPass()}});
+    } catch (e) { throw {code: e?.name === "AbortError" ? "cancelled" : "network"}; }
+    if (!r.ok) {
+      let e = {}; try { e = await r.json(); } catch {}
+      const code = ["passcode","rate_limited","prompt_too_large","ai_not_configured"].includes(e.error) ? e.error : "upstream";
+      if (code === "passcode") showPassBox(true);
+      throw {code};
+    }
+    return r;
+  };
+  const toMsgs = input => typeof input === "string" ? [{role:"user", content:input}] : input;
+  const split = buf => { const i = buf.indexOf("\u0000"); return i < 0 ? [buf, null] : [buf.slice(0, i), buf.slice(i + 1)]; };
+  const fn = async (input, opts = {}) => {
+    const r = await call({messages:toMsgs(input), stream:true}, opts.signal);
+    const reader = r.body.getReader(), dec = new TextDecoder(); let buf = "";
+    try {
+      for (;;) {
+        const {done, value} = await reader.read(); if (done) break;
+        buf += dec.decode(value, {stream:true});
+        opts.onText?.({text: split(buf)[0]});
+      }
+    } catch { throw {code:"cancelled", text: split(buf)[0]}; }
+    const [text, metaRaw] = split(buf); let meta = {};
+    try { meta = metaRaw ? JSON.parse(metaRaw) : {}; } catch {}
+    if (meta.error) throw {code:"upstream", text};
+    if (!text.trim()) throw {code:"empty_completion"};
+    return {text, truncated: !!meta.truncated};
+  };
+  fn.json = async (prompt, opts = {}) => {
+    const r = await call({messages:toMsgs(prompt), json_mode:true, stream:false}, opts.signal);
+    const {text} = await r.json();
+    const clean = String(text || "").replace(/```(?:json)?/gi, "").trim();
+    const a = clean.indexOf("["), b = clean.lastIndexOf("]");
+    try { return JSON.parse(a >= 0 && b > a ? clean.slice(a, b + 1) : clean); } catch { throw {code:"invalid_json"}; }
+  };
+  return fn;
+}
+async function initBackend(){
+  try {
+    const r = await fetch("/api/health", {cache:"no-store"});
+    const h = r.ok ? await r.json() : null;
+    if (h?.ai) {
+      backendMode = true; sample = makeRemoteSample(); aiReady = true;
+      if (h.passcode && !getPass()) showPassBox(true);
+    }
+  } catch {}
+  setAIStatus();
+}
+if (window.claude?.use) {
+  claude.use("sample").then(s => { sample = s; aiReady = !!s; setAIStatus(); });
+} else initBackend();
+
+function learnerSnapshot(){
+  const cd = currentDay(), c = counts(), w = weakDomains();
+  const recentMiss = state.quiz.log.filter(l => !l.ok).slice(-6).map(l => `- (${DOMAINS[l.d].name}) ${l.q}`).join("\n") || "none yet";
+  const boson = state.boson.slice(-5).map(b => `- Exam ${b.exam} ${b.mode}: ${b.score}%${b.weak?` weak: ${b.weak}`:""}`).join("\n") || "no attempts logged";
+  const focusN = +($("tutor-day")?.value || cd.n);
+  const memo = (state.days[focusN]?.memo || "").slice(0, 1500);
+  const exam = state.examDate ? `${state.examDate} (${Math.ceil((new Date(state.examDate)-new Date())/86400000)} days away)` : "not set";
+  return `LEARNER STATE
+- First incomplete course day: Day ${cd.n} ${cd.title}. Tutor focus day: Day ${focusN} ${DAYS[focusN-1].title}.
+- Days complete: ${c.doneDays}/63. Best Boson Simulation: ${c.best || "none"}%. Exam date: ${exam}.
+- Domain accuracy (in-app quizzes): ${w.map(x => `${x.d}.0 ${x.p===null?"untested":x.p+"%/"+x.t}`).join(", ")}.
+- Weakest domains right now: ${w.slice(0,2).map(x => DOMAINS[x.d].name).join(", ")}.
+- Recent missed questions:\n${recentMiss}
+- Recent Boson attempts:\n${boson}
+- Learner's own notes for Day ${focusN}: ${memo ? "\n" + memo : "none"}`;
+}
+function syllabusText(){
+  return KB.map(k => `Day ${k[0]} ${DAYS[k[0]-1].title} [D${k[1]}]: ${k[2]}${k[3]?` CMDS: ${k[3]}`:""}${k[4]?` TRAP: ${k[4]}`:""}`).join("\n");
+}
+function catalogText(){
+  const dayLinks = DAYS.map(d =>
+    `Day ${d.n}: ${[d.links.yt&&"lecture "+d.links.yt, d.links.lab&&"lab "+d.links.lab, d.links.anki&&"anki "+d.links.anki, ...(d.links.notes||[]).map(u => "notes "+u)].filter(Boolean).join(" | ")}`).join("\n");
+  return RES.map(g => `${g.g}:\n` + g.items.map(i => `- ${i[0]}: ${i[1]}`).join("\n")).join("\n") + "\nPer-day videos:\n" + dayLinks;
+}
+const MODES = {
+  teach:"Teach clearly: explain the idea, show the IOS commands in a code block when relevant, and close with one quick check question.",
+  socratic:"Be Socratic: do not hand over the answer. Ask one guiding question at a time, confirm or correct the learner's reply, and only reveal the full answer after two attempts or if asked.",
+  coach:"Act as an exam coach: be brief, focus on how Cisco words questions, the distractors, and memorization hooks. Offer a practice question when useful."
+};
+function tutorRules(){
+  return `You are the CCNA 200-301 v1.1 tutor inside Maverick's "CCNA Lockstep" study app. The learner is an experienced security engineer (CISSP) studying for CCNA, following Jeremy's IT Lab 63-day course, Boson ExSim-Max, Anki, Packet Tracer and this app's CLI lab.
+
+GROUNDING
+- The COURSE SYLLABUS below is this app's summary of every course day. Anchor explanations to it and name the matching Day number (e.g. "Day 26–28, OSPF").
+- You have not watched the videos or read the linked notes; don't claim to quote them. Use the syllabus plus accurate standard CCNA knowledge. Mark anything beyond the 200-301 blueprint as "beyond CCNA".
+- When pointing to material, use ONLY URLs from the RESOURCE CATALOG, copied exactly. Never invent links. For reading material, link the exact per-day notes file listed for that day (never the repo root). For video, use the day's lecture link if listed, otherwise the course playlist.
+- Be precise with Cisco IOS syntax, default values, timers and port numbers. If unsure, say so.
+- The app's CLI lab is a simplified simulator (not real IOS); for full topologies send the learner to Packet Tracer.
+
+STYLE (${$("tutor-mode")?.value || "teach"} mode): ${MODES[$("tutor-mode")?.value || "teach"]}
+Keep answers under about 250 words unless asked for depth — the learner is often on a phone. Use short paragraphs, **bold** sparingly, \`inline code\` for commands, and fenced code blocks for multi-line configs. No tables.
+
+${learnerSnapshot()}
+
+COURSE SYLLABUS
+${syllabusText()}
+
+RESOURCE CATALOG
+${catalogText()}
+
+Reply "Ready." to confirm.`;
+}
+
+/* ---------- light markdown renderer (escapes everything) ---------- */
+function inlineMd(t){
+  let s = esc(t);
+  s = s.replace(/`([^`]+)`/g, "<code>$1</code>");
+  s = s.replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
+  s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  s = s.replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g, (m,p,u) => `${p}<a href="${u}" target="_blank" rel="noopener">${u.length>48?u.slice(0,45)+"…":u}</a>`);
+  return s;
+}
+function md(src){
+  const parts = String(src).split("```");
+  return parts.map((part, i) => {
+    if (i % 2) return `<pre class="md-code">${esc(part.replace(/^[a-z]*\n/i, ""))}</pre>`;
+    const lines = part.split("\n"); let html = "", list = null;
+    const close = () => { if (list) { html += `</${list}>`; list = null; } };
+    lines.forEach(l => {
+      let m;
+      if ((m = l.match(/^\s*[-*•]\s+(.*)/))) { if (list !== "ul") { close(); html += "<ul>"; list = "ul"; } html += `<li>${inlineMd(m[1])}</li>`; }
+      else if ((m = l.match(/^\s*\d+[.)]\s+(.*)/))) { if (list !== "ol") { close(); html += "<ol>"; list = "ol"; } html += `<li>${inlineMd(m[1])}</li>`; }
+      else if ((m = l.match(/^#{1,4}\s+(.*)/))) { close(); html += `<p class="md-h">${inlineMd(m[1])}</p>`; }
+      else if (l.trim() === "") { close(); }
+      else { close(); html += `<p>${inlineMd(l)}</p>`; }
+    });
+    close(); return html;
+  }).join("");
+}
+
+/* ---------- tutor chat ---------- */
+let chatCtl = null, chatBusy = false;
+function renderChat(){
+  const log = $("chat-log");
+  if (!tutor.turns.length) {
+    log.innerHTML = `<div class="empty"><p>Ask anything on the 200-301 blueprint. The tutor knows the full 63-day syllabus, your progress, your Boson weak areas and your day notes.</p></div>`;
+  } else {
+    log.innerHTML = tutor.turns.map(t => `<div class="msg ${t.role}">${t.role==="user" ? `<p>${esc(t.show||t.content).replace(/\n/g,"<br>")}</p>` : md(t.content)}</div>`).join("");
+  }
+  log.scrollTop = log.scrollHeight;
+}
+function renderChips(){
+  const cd = currentDay(), w = weakDomains()[0];
+  const chips = [
+    [`Teach Day ${cd.n}`, `Teach me Day ${cd.n} (${cd.title}) — core ideas, commands and exam traps. End with one check question.`],
+    [`Drill ${DOMAINS[w.d].name}`, `Give me 3 quick exam-style questions on ${DOMAINS[w.d].name}, one at a time. Wait for my answer before the next.`],
+    ["Explain my last miss", null],
+    ["Subnetting trick", "Show me the fastest mental method for finding network, broadcast and host range, with one worked /27 and one /20 example."],
+    ["Am I ready to book?", "Based on my progress, Boson scores and weak domains, am I ready to book the exam? Be honest and give the gaps to close first."]
+  ];
+  $("chip-row").innerHTML = chips.map((c,i) => `<button class="chip" data-chip="${i}" data-ai>${esc(c[0])}</button>`).join("");
+  $("chip-row").onclick = e => {
+    const i = e.target.dataset.chip; if (i == null) return;
+    if (+i === 2) {
+      const miss = state.quiz.log.filter(l => !l.ok).slice(-1)[0];
+      if (!miss) { toast("No missed questions yet — take a quiz first"); return; }
+      askTutor(`I missed this question: "${miss.q}" I chose "${miss.pick}", the correct answer is "${miss.ans}". Explain why, and give me a way to remember it.`);
+    } else askTutor(chips[i][1]);
+  };
+  setAIStatus();
+}
+function renderTutorSide(){
+  const sel = $("tutor-day");
+  if (!sel.options.length) {
+    DAYS.forEach(d => { const o = document.createElement("option"); o.value = d.n; o.textContent = `Day ${d.n} · ${d.title}`; sel.appendChild(o); });
+    sel.value = currentDay().n;
+  }
+  const n = +sel.value, kb = KB_BY_DAY[n], d = DAYS[n-1];
+  $("tutor-ctx").innerHTML = `
+    <p class="tiny">${DOMAINS[kb.d].name}</p>
+    <p>${esc(kb.c)}</p>
+    ${kb.cmd ? `<pre class="md-code">${esc(kb.cmd.split("; ").join("\n"))}</pre>` : ""}
+    ${kb.trap ? `<p class="trap">${esc(kb.trap)}</p>` : ""}
+    <p class="links">${[["Lecture", d.links.yt || PLAYLIST], d.links.lab && ["Lab video", d.links.lab], d.links.anki && ["Anki video", d.links.anki], ...notesLinks(n)].filter(Boolean).map(([t,u]) => `<a href="${u}" target="_blank" rel="noopener">${t}</a>`).join("")}</p>`;
+}
+async function askTutor(text, show){
+  openView("tutor");
+  if (!aiReady) { setAIStatus(); toast("AI tutor unavailable here"); return; }
+  if (chatBusy) { toast("The tutor is still answering"); return; }
+  chatBusy = true;
+  tutor.turns.push({role:"user", content:text, show});
+  tutor.turns.push({role:"assistant", content:"", pending:true});
+  saveTutor(); renderChat();
+  const bubble = $("chat-log").lastElementChild;
+  bubble.innerHTML = `<p class="thinking">Thinking…</p>`;
+  $("chat-send").classList.add("hidden"); $("chat-stop").classList.remove("hidden");
+  chatCtl = new AbortController();
+  const history = tutor.turns.slice(0, -1).slice(-12).filter(t => t.content).map(t => ({role:t.role, content:t.content}));
+  while (history.length && history[0].role !== "user") history.shift();
+  const input = [{role:"user", content:tutorRules()}, {role:"assistant", content:"Ready."}, ...history];
+  const last = tutor.turns[tutor.turns.length-1];
+  try {
+    const {text: out, truncated} = await sample(input, {
+      cache:false, signal:chatCtl.signal, modelTier:"default",
+      onText: ({text}) => { last.content = text; bubble.innerHTML = md(text); $("chat-log").scrollTop = $("chat-log").scrollHeight; }
+    });
+    last.content = out + (truncated ? "\n\n_(Answer cut short — ask me to continue.)_" : "");
+  } catch (e) {
+    if (e?.code === "not_granted") { aiReady = false; aiDenied = true; setAIStatus(); }
+    if (e?.code === "passcode") showPassBox(true);
+    last.content = (e?.text || "") + (e?.code === "cancelled" ? "\n\n_(Stopped.)_" : `\n\n${aiErr(e)}`);
+  } finally {
+    delete last.pending; chatBusy = false; saveTutor(); renderChat(); touchStudy(); save(state);
+    $("chat-send").classList.remove("hidden"); $("chat-stop").classList.add("hidden");
+  }
+}
+
+/* ---------- quiz engine ---------- */
+let curQ = null;
+function allQuestions(){ return [...QB, ...state.quiz.gen]; }
+function pickQuestion(scope){
+  let pool = allQuestions();
+  if (scope.startsWith("dom:")) pool = pool.filter(q => q.d === +scope.slice(4));
+  if (scope.startsWith("day:")) { const n = +scope.slice(4); const near = pool.filter(q => q.day === n); pool = near.length ? near : pool.filter(q => q.d === KB_BY_DAY[n].d); }
+  if (!pool.length) return null;
+  const w = Object.fromEntries(weakDomains().map((x,i) => [x.d, 6 - i]));
+  const box = state.quiz.box;
+  const scored = pool.filter(q => q.id !== curQ?.id).map(q => {
+    const b = box[q.id] || 0; // 0 = new
+    let s = (b === 0 ? 3 : 6 - b) * 2 + (scope === "adaptive" ? w[q.d] : 0) + Math.random() * 4;
+    return {q, s};
+  }).sort((a,b) => b.s - a.s);
+  return (scored[0] || {q:pool[0]}).q;
+}
+function renderQuestion(q){
+  const card = $("quiz-card");
+  if (!q) { card.innerHTML = `<p class="empty">No questions in this scope yet. Choose Generate to have the tutor write some.</p>`; return; }
+  curQ = q;
+  const box = state.quiz.box[q.id] || 0;
+  card.innerHTML = `
+    <p class="tiny">${q.d}.0 ${DOMAINS[q.d].name}${q.day?` · Day ${q.day}`:""}${q.ai?" · AI-written":""} · ${box ? "review box "+box : "new"}</p>
+    <p class="q-text">${esc(q.q)}</p>
+    <div class="opts">${q.o.map((o,i) => `<button class="opt" data-i="${i}"><span class="k">${"ABCD"[i]}</span>${esc(o)}</button>`).join("")}</div>
+    <div id="q-after"></div>`;
+}
+function nextQuestion(){ renderQuestion(pickQuestion($("quiz-scope").value)); }
+function answerQuestion(i){
+  const q = curQ; if (!q || $("quiz-card").querySelector(".opt.right")) return;
+  const ok = i === q.a;
+  document.querySelectorAll("#quiz-card .opt").forEach((b,j) => { b.disabled = true; if (j === q.a) b.classList.add("right"); else if (j === i) b.classList.add("wrong"); });
+  const d = state.quiz.dom[q.d]; d.t++; if (ok) d.c++;
+  state.quiz.box[q.id] = ok ? Math.min(5, (state.quiz.box[q.id]||0) + 1) : 1;
+  state.quiz.seen++;
+  state.quiz.log.push({id:q.id, d:q.d, ok, q:q.q, pick:q.o[i], ans:q.o[q.a], t:Date.now()});
+  state.quiz.log = state.quiz.log.slice(-80);
+  touchStudy(); save(state); renderMastery();
+  $("q-after").innerHTML = `
+    <p class="${ok?"ok-t":"bad-t"}">${ok ? "Correct." : `Not quite — the answer is ${"ABCD"[q.a]}.`}</p>
+    <p>${esc(q.why||"")}</p>
+    <div class="row"><button class="btn" id="q-next">Next question</button>
+    <button class="btn ghost" id="q-explain" data-ai>Explain with tutor</button></div>`;
+  setAIStatus();
+  $("q-next").onclick = nextQuestion;
+  $("q-explain").onclick = () => askTutor(`Quiz question: "${q.q}"\nOptions: ${q.o.map((o,j)=>"ABCD"[j]+") "+o).join("  ")}\nI chose ${"ABCD"[i]}; correct is ${"ABCD"[q.a]}. Explain the concept behind it, why each wrong option is wrong, and a memory hook.`, `Explain: ${q.q}`);
+}
+async function generateQuiz(){
+  if (!aiReady) { setAIStatus(); toast("AI question generation unavailable here"); return; }
+  const scope = $("quiz-scope").value;
+  let target, days;
+  if (scope.startsWith("day:")) { const n = +scope.slice(4); days = [n]; target = `Day ${n} ${DAYS[n-1].title}`; }
+  else if (scope.startsWith("dom:")) { const d = +scope.slice(4); days = KB.filter(k => k[1] === d).map(k => k[0]); target = `domain ${d}.0 ${DOMAINS[d].name}`; }
+  else { const w = weakDomains().slice(0,2).map(x => x.d); days = KB.filter(k => w.includes(k[1])).map(k => k[0]); target = `the learner's weakest domains: ${w.map(d => DOMAINS[d].name).join(" and ")}`; }
+  const ground = days.map(n => { const k = KB_BY_DAY[n]; return `Day ${n} ${DAYS[n-1].title} [D${k.d}]: ${k.c} CMDS: ${k.cmd} TRAP: ${k.trap}`; }).join("\n");
+  const avoid = state.quiz.gen.slice(-20).map(q => "- " + q.q).join("\n");
+  const btn = $("quiz-gen"); btn.disabled = true; btn.textContent = "Writing questions…";
+  $("quiz-card").innerHTML = `<p class="thinking">The tutor is writing 5 questions on ${esc(target)}…</p>`;
+  try {
+    const out = await sample.json(`Write 5 CCNA 200-301 v1.1 multiple-choice questions on ${target}, in the style of Cisco and Boson (scenario or command-output based where possible, one clearly correct answer, plausible distractors). Stay strictly inside this syllabus:\n${ground}\n\nAvoid repeating these:\n${avoid || "- (none)"}\n\nReply with only a JSON array of 5 objects: {"q": string, "o": [4 strings], "a": index 0-3 of the correct option, "why": one or two sentences explaining the answer, "d": exam domain number 1-6, "day": course day number}. Vary which index is correct.`, {modelTier:"default"});
+    const valid = (Array.isArray(out) ? out : []).filter(q => q && typeof q.q === "string" && Array.isArray(q.o) && q.o.length === 4 && q.o.every(x => typeof x === "string") && Number.isInteger(q.a) && q.a >= 0 && q.a < 4 && DOMAINS[q.d]);
+    if (!valid.length) throw {code:"invalid_json"};
+    const stamp = Date.now().toString(36);
+    const fresh = valid.map((q,i) => ({id:`g${stamp}${i}`, d:+q.d, day: Number.isInteger(q.day) && q.day>=1 && q.day<=63 ? q.day : null, q:q.q, o:q.o, a:q.a, why:String(q.why||""), ai:true}));
+    state.quiz.gen = [...state.quiz.gen, ...fresh].slice(-120);
+    save(state); renderMastery(); toast(`${fresh.length} new questions added`);
+    renderQuestion(fresh[0]);
+  } catch (e) {
+    if (e?.code === "not_granted") { aiReady = false; aiDenied = true; setAIStatus(); }
+    $("quiz-card").innerHTML = `<p class="bad-t">${esc(aiErr(e))}</p>`;
+  } finally { btn.disabled = !aiReady; btn.textContent = "Generate 5 with AI"; }
+}
+
+/* ---------- subnetting drills ---------- */
+let sn = null;
+const rnd = (a,b) => a + Math.floor(Math.random()*(b-a+1));
+function prefixMask(p){ return intToIp(p ? (0xFFFFFFFF << (32-p)) >>> 0 : 0); }
+function newSubnet(){
+  const mode = $("sn-mode").value;
+  if (mode === "host") {
+    const p = rnd(17, 30);
+    const first = [10, 172, 192][rnd(0,2)];
+    const ip = first === 10 ? `10.${rnd(0,255)}.${rnd(0,255)}.${rnd(1,254)}` : first === 172 ? `172.${rnd(16,31)}.${rnd(0,255)}.${rnd(1,254)}` : `192.168.${rnd(0,255)}.${rnd(1,254)}`;
+    const m = prefixMask(p), net = netOf(ip, m), bc = intToIp((ipToInt(net) | (~ipToInt(m) >>> 0)) >>> 0);
+    sn = {mode, ip, p, ans:{net, bc, first:intToIp(ipToInt(net)+1), last:intToIp(ipToInt(bc)-1), hosts:String(2**(32-p)-2)}};
+    $("sn-q").innerHTML = `<span class="big">${ip}/${p}</span><span class="tiny">mask ${m}</span>`;
+    $("sn-fields").innerHTML = [["net","Network address"],["bc","Broadcast"],["first","First usable"],["last","Last usable"],["hosts","Usable hosts"]]
+      .map(([k,l]) => `<label><span class="tiny">${l}</span><input data-sn="${k}" inputmode="decimal" autocomplete="off"></label>`).join("");
+  } else if (mode === "wild") {
+    const p = rnd(8, 30), m = prefixMask(p), w = intToIp((~ipToInt(m)) >>> 0);
+    const flip = Math.random() < .5;
+    sn = {mode, ans: flip ? {x:m} : {x:w}, show: flip ? `Wildcard ${w} → subnet mask?` : `Mask ${m} (/${p}) → wildcard?`};
+    $("sn-q").innerHTML = `<span class="big">${flip ? w : m}</span><span class="tiny">${flip ? "wildcard → subnet mask" : "/"+p+" mask → wildcard"}</span>`;
+    $("sn-fields").innerHTML = `<label><span class="tiny">${flip?"Subnet mask":"Wildcard mask"}</span><input data-sn="x" inputmode="decimal" autocomplete="off"></label>`;
+  } else {
+    const hosts = [2,5,12,25,28,50,60,100,120,200,250,400,500,1000,2000,4000][rnd(0,15)];
+    let h = 2; while (2**h - 2 < hosts) h++;
+    sn = {mode, ans:{x:"/"+(32-h)}};
+    $("sn-q").innerHTML = `<span class="big">${hosts} hosts</span><span class="tiny">smallest subnet that fits</span>`;
+    $("sn-fields").innerHTML = `<label><span class="tiny">Prefix (e.g. /26)</span><input data-sn="x" autocomplete="off"></label>`;
+  }
+  $("sn-out").innerHTML = "";
+  $("sn-fields").querySelector("input")?.focus({preventScroll:true});
+}
+function checkSubnet(){
+  if (!sn) return;
+  let all = true;
+  document.querySelectorAll("#sn-fields input").forEach(inp => {
+    let v = inp.value.trim(); if (sn.mode === "fit" && v && !v.startsWith("/")) v = "/" + v;
+    const ok = v === sn.ans[inp.dataset.sn];
+    inp.classList.toggle("in-ok", ok); inp.classList.toggle("in-bad", !ok);
+    if (!ok) all = false;
+  });
+  const s = state.subnet; s.t++;
+  if (all) { s.c++; s.streak++; s.best = Math.max(s.best, s.streak); } else s.streak = 0;
+  touchStudy(); save(state); renderSnStats();
+  $("sn-out").innerHTML = all ? `<p class="ok-t">All correct. Streak ${s.streak}.</p>` : `<p class="bad-t">Some fields are off. Fix them or choose Show work.</p>`;
+  if (all) setTimeout(newSubnet, 900);
+}
+function showWork(){
+  if (!sn) return;
+  let html = "";
+  if (sn.mode === "host") {
+    const m = prefixMask(sn.p), oct = Math.floor(sn.p / 8), mv = +m.split(".")[Math.min(oct,3)], block = 256 - mv;
+    html = `<p>/${sn.p} → mask ${m}. Interesting octet is octet ${Math.min(oct,3)+1} (mask value ${mv}), so the block size is 256 − ${mv} = <b>${block}</b>.</p>
+      <p>Find the multiple of ${block} at or below that octet of ${sn.ip}: network <b>${sn.ans.net}</b>. Next block minus one is the broadcast <b>${sn.ans.bc}</b>.</p>
+      <p>Hosts: ${sn.ans.first} – ${sn.ans.last}. 2^${32-sn.p} − 2 = <b>${sn.ans.hosts}</b>.</p>`;
+  } else if (sn.mode === "wild") html = `<p>Subtract each octet from 255: <b>${sn.ans.x}</b>.</p>`;
+  else html = `<p>Find the smallest h with 2^h − 2 ≥ hosts, then prefix = 32 − h: <b>${sn.ans.x}</b>.</p>`;
+  $("sn-out").innerHTML = html;
+  document.querySelectorAll("#sn-fields input").forEach(inp => { inp.value = sn.ans[inp.dataset.sn]; });
+}
+function renderSnStats(){
+  const s = state.subnet;
+  $("sn-stats").innerHTML = `<div class="sn-stat"><b>${s.t ? Math.round(s.c/s.t*100) : 0}%</b><span class="tiny">accuracy over ${s.t}</span></div>
+    <div class="sn-stat"><b>${s.streak}</b><span class="tiny">current streak</span></div>
+    <div class="sn-stat"><b>${s.best}</b><span class="tiny">best streak</span></div>
+    <p class="tiny">Target: 10 in a row under 30 seconds each before Day 16.</p>`;
+}
+
+/* ---------- CLI lab → tutor ---------- */
+function cliReview(){
+  const lines = [...$("term-out").children].map(d => d.textContent).join("\n").split("\n").slice(-60).join("\n");
+  const L = LABS.find(x => x.id === currentLabId);
+  const goals = L.goals.map(g => { let ok = false; try { ok = g.check(); } catch {} return `${ok ? "[met]" : "[open]"} ${g.text}`; }).join("\n") || "sandbox";
+  const run = showRun(lab.devices[lab.current]).slice(0, 3000);
+  askTutor(`Review my CLI lab session. Tell me what I did right, what's wrong or missing for the objectives, and the exact next commands. (This is the app's simplified simulator.)\n\nLab: ${L.title}\nObjectives:\n${goals}\n\nCurrent device: ${lab.current}\nRunning config:\n${run}\n\nLast console lines:\n${lines}`, `Review my CLI session on ${lab.current} (${L.title})`);
+}
+
+/* ---------- resources ---------- */
+function renderResources(){
+  $("res-list").innerHTML = RES.map(g => `<div class="card"><h3>${esc(g.g)}</h3><ul class="clean">${g.items.map(i => `<li><a href="${i[1]}" target="_blank" rel="noopener">${esc(i[0])}</a></li>`).join("")}</ul></div>`).join("") +
+    `<div class="card"><h3>Per-day notes and videos</h3><ul class="clean">${DAYS.map(d => `<li>Day ${d.n} · ${esc(d.title)}: ${[...notesLinks(d.n).map(([t,u]) => `<a href="${u}" target="_blank" rel="noopener">${t.toLowerCase()}</a>`), d.links.yt&&`<a href="${d.links.yt}" target="_blank" rel="noopener">lecture</a>`, d.links.lab&&`<a href="${d.links.lab}" target="_blank" rel="noopener">lab</a>`, d.links.anki&&`<a href="${d.links.anki}" target="_blank" rel="noopener">Anki</a>`].filter(Boolean).join(" · ")}</li>`).join("")}</ul>
+    <p class="tiny">Community PDFs and GitHub notes are unofficial; official slides are in Jeremy’s paid course. If a Drive link dies, start from the Reddit thread.</p></div>`;
+}
+
+/* ---------- export via downloads capability ---------- */
+async function exportProgress(){
+  const data = JSON.stringify({study:state, lab:serializeLab(), tutor}, null, 2);
+  const dl = window.claude?.use ? await claude.use("downloads") : null;
+  if (dl) {
+    try { await dl.save({filename:"ccna-lockstep-progress.json", data}); toast("Exported"); }
+    catch (e) { toast(e?.code === "declined" ? "Export cancelled" : "Export failed — try again"); }
+    return;
+  }
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([data], {type:"application/json"})); a.download = "ccna-lockstep-progress.json"; a.click();
+}
+
+/* ---------- cloud sync (private per-viewer doc) ---------- */
+let syncRef = null, syncTimer = null;
+function setSync(msg){ const el = $("sync-status"); if (el) el.textContent = msg; }
+function queueSync(){
+  if (!syncRef) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(async () => {
+    try { await syncRef.set({state: JSON.parse(JSON.stringify(state)), updatedAt: state._t || Date.now()}); setSync("Progress synced to your claude.ai account."); }
+    catch { setSync("Sync paused — progress is still saved in this browser."); }
+  }, 1500);
+}
+(async () => {
+  if (!window.claude?.use) { setSync("Progress is saved in this browser. Use Export to back it up or move it to another device."); return; }
+  const [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
+  if (!db || !user) { setSync("Progress is saved in this browser only."); return; }
+  const uid = await user.id();
+  if (!uid) { setSync("Progress is saved in this browser only."); return; }
+  try {
+    syncRef = db.doc(`data/users/${uid}/ccna`);
+    const snap = await syncRef.get();
+    const remote = snap.exists ? snap.data() : null;
+    if (remote?.state && (remote.updatedAt || 0) > (state._t || 0)) {
+      const base = defaultState();
+      state = {...base, ...remote.state, days: {...base.days, ...(remote.state.days || {})}};
+      try { _origSave(state); } catch {}
+      renderAll(); if (!$("view-tutor").classList.contains("hidden")) { renderChips(); renderTutorSide(); }
+      setSync("Loaded your synced progress.");
+    } else { queueSync(); setSync("Progress syncs across your devices."); }
+  } catch { syncRef = null; setSync("Sync unavailable — progress is saved in this browser."); }
+})();
+
+/* ---------- wiring ---------- */
+$("tutor-mode").value = tutor.mode || "teach";
+$("tutor-mode").addEventListener("change", e => { tutor.mode = e.target.value; saveTutor(); });
+$("tutor-day").addEventListener("change", renderTutorSide);
+$("tutor-new").addEventListener("click", () => { if (chatBusy) chatCtl?.abort(); tutor.turns = []; saveTutor(); renderChat(); });
+$("chat-send").addEventListener("click", () => { const v = $("chat-box").value.trim(); if (!v) return; $("chat-box").value = ""; askTutor(v); });
+$("chat-stop").addEventListener("click", () => chatCtl?.abort());
+$("chat-box").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); $("chat-send").click(); } });
+$("quiz-card").addEventListener("click", e => { const b = e.target.closest(".opt"); if (b && !b.disabled) answerQuestion(+b.dataset.i); });
+$("quiz-next").addEventListener("click", nextQuestion);
+$("quiz-gen").addEventListener("click", generateQuiz);
+(() => {
+  const sel = $("quiz-scope");
+  sel.innerHTML = `<option value="adaptive">Adaptive — weakest first</option>` +
+    Object.entries(DOMAINS).map(([k,D]) => `<option value="dom:${k}">${k}.0 ${D.name}</option>`).join("") +
+    DAYS.map(d => `<option value="day:${d.n}">Day ${d.n} · ${d.title}</option>`).join("");
+})();
+$("sn-new").addEventListener("click", newSubnet);
+$("sn-mode").addEventListener("change", newSubnet);
+$("sn-check").addEventListener("click", checkSubnet);
+$("sn-show").addEventListener("click", showWork);
+$("sn-fields").addEventListener("keydown", e => { if (e.key === "Enter") checkSubnet(); });
+$("cli-ask").addEventListener("click", cliReview);
+$("pass-save").addEventListener("click", () => {
+  try { localStorage.setItem(PASS_KEY, $("pass-in").value.trim()); } catch {}
+  $("pass-in").value = ""; showPassBox(false); toast("Passcode saved on this device");
+});
+
+document.querySelectorAll(".tab").forEach(btn => btn.addEventListener("click", () => {
+  const v = btn.dataset.view;
+  if (v === "tutor") { renderTutorSide(); renderChips(); renderChat(); }
+  if (v === "quiz" && !curQ) nextQuestion();
+  if (v === "subnet" && !sn) { newSubnet(); renderSnStats(); }
+}));
+
+renderResources();
+renderAll();
+setAIStatus();
+
+</script>
+</body>
+</html>

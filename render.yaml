@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: ccna-lockstep-tutor
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips="*"
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: APP_PASSCODE
+        sync: false
+      - key: CLAUDE_MODEL
+        value: claude-sonnet-4-6
+      - key: RATE_LIMIT_PER_10MIN
+        value: "40"
+      - key: DAILY_REQUEST_CAP
+        value: "500"

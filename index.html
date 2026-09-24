@@ -6,6 +6,9 @@
   <title>CCNA Lockstep Tutor</title>
   <meta name="theme-color" content="#0b1220" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect fill='%23049fd9' width='64' height='64' rx='12'/><text x='32' y='42' text-anchor='middle' font-size='28' fill='white' font-family='sans-serif'>C</text></svg>" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"
+          integrity="sha384-GFr3yTh5lJznCbZfpTtXnwboFsxqtTQoeTZCRHhE0579KrRmlCzen5AA8ohaB5ug"
+          crossorigin="anonymous"></script>
   <style>
     :root {
       --bg: #071018; --bg2: #0d1824; --panel: #101c2b; --panel2: #152536;
@@ -199,6 +202,31 @@
     .res-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
     @media (max-width: 720px) { .pass-box { padding: 0 14px 14px; }
     .res-grid { grid-template-columns: 1fr; } }
+
+    /* Auth badge + modal */
+    .auth { display: flex; gap: 6px; align-items: center; margin-left: 8px; }
+    .auth .email { color: var(--muted); font-size: 12px; }
+    .auth-btn {
+      border: 1px solid var(--line); background: var(--panel); color: var(--text);
+      padding: 6px 12px; border-radius: 999px; cursor: pointer; font-size: 12px;
+    }
+    .auth-btn:hover { border-color: var(--accent); }
+    .auth-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      display: none; align-items: center; justify-content: center; z-index: 100;
+    }
+    .auth-modal-overlay.show { display: flex; }
+    .auth-modal {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+      padding: 24px; width: min(400px, 92vw); box-shadow: var(--shadow);
+    }
+    .auth-modal h3 { margin: 0 0 6px; }
+    .auth-modal .field { margin-bottom: 12px; }
+    .auth-modal .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .auth-modal .err { color: var(--bad); font-size: 12px; margin-top: 8px; }
+    .auth-modal .actions { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; gap: 8px; }
+    .auth-modal .link { color: var(--muted); font-size: 12px; cursor: pointer; text-decoration: underline; }
+    @media (max-width: 640px) { .auth { width: 100%; justify-content: flex-end; margin-left: 0; margin-top: 6px; } }
   </style>
 </head>
 <body>
@@ -219,6 +247,7 @@
         <button class="tab" data-view="resources">Resources</button>
         <button class="tab" data-view="settings">Backup</button>
       </nav>
+      <div class="auth" id="auth-badge"></div>
     </div>
   </header>
 
@@ -477,6 +506,27 @@
     <footer>Unofficial personal planner. Not affiliated with Cisco, Boson, or Jeremy’s IT Lab. CLI Lab is a teaching emulator, not real IOS. The AI tutor can make mistakes — verify commands in Packet Tracer.</footer>
   </main>
   <div class="toast" id="toast"></div>
+
+  <div class="auth-modal-overlay" id="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+    <div class="auth-modal">
+      <h3 id="auth-title">Sign in</h3>
+      <p class="tiny">Invite-only. If you haven't been invited, ask the group admin.</p>
+      <div class="field">
+        <label for="auth-email">Email</label>
+        <input type="email" id="auth-email" autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="auth-password">Password</label>
+        <input type="password" id="auth-password" autocomplete="current-password">
+      </div>
+      <div class="err hidden" id="auth-err"></div>
+      <div class="actions">
+        <span class="link" id="auth-close">Continue without account</span>
+        <button class="btn" id="auth-submit">Sign in</button>
+      </div>
+      <p class="tiny" style="margin-top:12px"><a href="#" id="auth-reset">Forgot password?</a></p>
+    </div>
+  </div>
 
 <script>
 const DAYS = [
@@ -1703,6 +1753,9 @@ const AI_ERR = {
   ai_not_configured:"The server has no Anthropic API key set yet.",
   network:"Can't reach the server. Check your connection and try again.",
   upstream:"The Claude API returned an error. Try again in a moment.",
+  invalid_token:"Your session expired. Sign in again.",
+  user_daily_cap:"You've hit your daily AI limit. Try again tomorrow.",
+  unauthenticated:"Sign in to use the AI tutor.",
 };
 function aiErr(e){ return AI_ERR[e?.code] || "The tutor could not answer right now. Try again in a moment."; }
 function setAIStatus(){
@@ -1717,15 +1770,26 @@ const getPass = () => { try { return localStorage.getItem(PASS_KEY) || ""; } cat
 function showPassBox(show){ $("pass-box")?.classList.toggle("hidden", !show); }
 function makeRemoteSample(){
   const call = async (body, signal) => {
+    const headers = {"Content-Type": "application/json"};
+    let token = null;
+    if (window._sb) {
+      try {
+        const {data:{session}} = await window._sb.auth.getSession();
+        token = session?.access_token || null;
+      } catch {}
+    }
+    if (token) headers["Authorization"] = "Bearer " + token;
+    else headers["X-App-Passcode"] = getPass();
     let r;
     try {
-      r = await fetch("/api/sample", {method:"POST", signal, body:JSON.stringify(body),
-        headers:{"Content-Type":"application/json", "X-App-Passcode":getPass()}});
+      r = await fetch("/api/sample", {method:"POST", signal, body:JSON.stringify(body), headers});
     } catch (e) { throw {code: e?.name === "AbortError" ? "cancelled" : "network"}; }
     if (!r.ok) {
       let e = {}; try { e = await r.json(); } catch {}
-      const code = ["passcode","rate_limited","prompt_too_large","ai_not_configured"].includes(e.error) ? e.error : "upstream";
-      if (code === "passcode") showPassBox(true);
+      const known = ["passcode","rate_limited","prompt_too_large","ai_not_configured","invalid_token","user_daily_cap","unauthenticated","daily_cap"];
+      const code = known.includes(e.error) ? e.error : "upstream";
+      if (code === "passcode" && !token) showPassBox(true);
+      if (code === "invalid_token" || code === "unauthenticated") window._authOpen?.();
       throw {code};
     }
     return r;
@@ -2168,6 +2232,159 @@ renderResources();
 renderAll();
 setAIStatus();
 
+</script>
+<script>
+/* ===================== Supabase Auth Layer ===================== */
+(async () => {
+  let cfg;
+  try {
+    const r = await fetch("/api/config", {cache:"no-store"});
+    cfg = r.ok ? await r.json() : null;
+  } catch {}
+
+  const badge = document.getElementById("auth-badge");
+  const modal = document.getElementById("auth-modal");
+  const emailIn = document.getElementById("auth-email");
+  const pwIn = document.getElementById("auth-password");
+  const errEl = document.getElementById("auth-err");
+  const submitBtn = document.getElementById("auth-submit");
+  const closeBtn = document.getElementById("auth-close");
+  const resetLink = document.getElementById("auth-reset");
+
+  const openModal = () => { modal.classList.add("show"); errEl.classList.add("hidden"); setTimeout(() => emailIn.focus(), 50); };
+  const closeModal = () => modal.classList.remove("show");
+  window._authOpen = openModal;
+
+  closeBtn.onclick = closeModal;
+  modal.onclick = e => { if (e.target === modal) closeModal(); };
+
+  // If Supabase not configured on backend, run in passcode-only mode
+  if (!cfg?.supabase_url || !cfg?.supabase_anon_key || !window.supabase) {
+    badge.innerHTML = ""; // no button in header, passcode flow stays as-is
+    return;
+  }
+
+  const sb = window.supabase.createClient(cfg.supabase_url, cfg.supabase_anon_key, {
+    auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+  });
+  window._sb = sb;
+
+  function renderBadge(session) {
+    if (session?.user) {
+      const email = session.user.email || "user";
+      const short = email.length > 22 ? email.slice(0, 19) + "..." : email;
+      badge.innerHTML = `<span class="email">${short}</span> <button class="auth-btn" id="auth-logout">Sign out</button>`;
+      document.getElementById("auth-logout").onclick = async () => {
+        await sb.auth.signOut();
+        location.reload();
+      };
+    } else {
+      badge.innerHTML = `<button class="auth-btn" id="auth-open">Sign in</button>`;
+      document.getElementById("auth-open").onclick = openModal;
+    }
+  }
+
+  submitBtn.onclick = async () => {
+    const email = emailIn.value.trim();
+    const password = pwIn.value;
+    if (!email || !password) { errEl.textContent = "Enter both email and password."; errEl.classList.remove("hidden"); return; }
+    submitBtn.disabled = true; submitBtn.textContent = "Signing in...";
+    errEl.classList.add("hidden");
+    const {data, error} = await sb.auth.signInWithPassword({email, password});
+    submitBtn.disabled = false; submitBtn.textContent = "Sign in";
+    if (error) { errEl.textContent = error.message || "Sign in failed"; errEl.classList.remove("hidden"); return; }
+    closeModal();
+    pwIn.value = "";
+    renderBadge(data.session);
+    await bootWithSession(data.session, true);
+  };
+  pwIn.addEventListener("keydown", e => { if (e.key === "Enter") submitBtn.click(); });
+
+  resetLink.onclick = async e => {
+    e.preventDefault();
+    const email = emailIn.value.trim() || prompt("Email to send password reset link to:");
+    if (!email) return;
+    const {error} = await sb.auth.resetPasswordForEmail(email, {redirectTo: window.location.origin});
+    if (error) { errEl.textContent = error.message; errEl.classList.remove("hidden"); }
+    else { toast("Password reset email sent"); }
+  };
+
+  async function bootWithSession(session, isFreshLogin) {
+    if (!session?.user) return;
+    const uid = session.user.id;
+
+    // Load remote progress
+    const {data: pRow} = await sb.from("progress").select("state").eq("user_id", uid).maybeSingle();
+    const remoteState = pRow?.state || {};
+
+    // Load remote tutor chats
+    const {data: tRow} = await sb.from("tutor_chats").select("turns, mode").eq("user_id", uid).maybeSingle();
+    const remoteTurns = tRow?.turns || [];
+    const remoteMode = tRow?.mode || "teach";
+
+    // Migration prompt: only on fresh login, only if remote is empty and local has something
+    if (isFreshLogin && Object.keys(remoteState).length === 0) {
+      const localState = localStorage.getItem("ccna-lockstep-v1");
+      if (localState) {
+        if (confirm("You have existing progress on this device. Import it to your account?")) {
+          try {
+            const parsed = JSON.parse(localState);
+            await sb.from("progress").upsert({user_id: uid, state: parsed});
+            Object.assign(remoteState, parsed);
+            const localTutor = localStorage.getItem("ccna-lockstep-tutor-v1");
+            if (localTutor) {
+              const t = JSON.parse(localTutor);
+              await sb.from("tutor_chats").upsert({user_id: uid, turns: t.turns || [], mode: t.mode || "teach"});
+              remoteTurns.push(...(t.turns || []));
+            }
+            toast("Progress imported");
+          } catch (err) { toast("Import failed: " + err.message); }
+        }
+      }
+    }
+
+    // Apply remote state if we have any
+    if (Object.keys(remoteState).length > 0 && typeof defaultState === "function") {
+      const base = defaultState();
+      window.state = {...base, ...remoteState, days: {...base.days, ...(remoteState.days || {})}};
+      if (typeof ensureState === "function") ensureState();
+      if (typeof renderAll === "function") renderAll();
+    }
+    if (remoteTurns.length && typeof tutor !== "undefined") {
+      tutor.turns = remoteTurns;
+      tutor.mode = remoteMode;
+      if (typeof renderChat === "function") renderChat();
+    }
+
+    // Hook save() and saveTutor() to also write to Supabase
+    const _origSave = window.save;
+    window.save = function(s) {
+      _origSave(s);
+      const snap = JSON.parse(JSON.stringify(s));
+      sb.from("progress").upsert({user_id: uid, state: snap}).then(({error}) => {
+        if (error) console.warn("[sync] progress upsert failed", error);
+      });
+    };
+    const _origSaveTutor = window.saveTutor;
+    window.saveTutor = function() {
+      _origSaveTutor();
+      sb.from("tutor_chats").upsert({
+        user_id: uid,
+        turns: (window.tutor?.turns || []).slice(-24),
+        mode: window.tutor?.mode || "teach"
+      }).then(({error}) => { if (error) console.warn("[sync] chats upsert failed", error); });
+    };
+  }
+
+  // Initial state
+  const {data: {session}} = await sb.auth.getSession();
+  renderBadge(session);
+  if (session) await bootWithSession(session, false);
+  sb.auth.onAuthStateChange((event, s) => {
+    renderBadge(s);
+    if (event === "SIGNED_OUT") setTimeout(() => location.reload(), 200);
+  });
+})();
 </script>
 </body>
 </html>

@@ -184,9 +184,13 @@ async def health():
 @app.get("/api/config")
 async def config():
     # Public config the frontend needs at boot. Nothing secret — anon key
-    # is safe to expose (RLS protects everything user-scoped).
+    # is safe to expose (RLS protects everything user-scoped). Only exposed
+    # once Supabase is FULLY configured on backend (JWT secret + service key
+    # present) so the frontend never enables login when backend can't verify.
+    if not SUPABASE_READY:
+        return {"supabase_url": None, "supabase_anon_key": None}
     return {
-        "supabase_url": SUPABASE_URL or None,
+        "supabase_url": SUPABASE_URL,
         "supabase_anon_key": os.getenv("SUPABASE_ANON_KEY", "") or None,
     }
 

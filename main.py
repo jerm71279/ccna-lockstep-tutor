@@ -21,6 +21,7 @@ import jwt
 from anthropic import AsyncAnthropic, APIError
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 # Anthropic
@@ -240,3 +241,19 @@ INDEX = Path(__file__).with_name("index.html")
 async def index():
     # Serve only the app page; nothing else in the repo is exposed.
     return FileResponse(INDEX, media_type="text/html", headers={"Cache-Control": "no-cache"})
+
+
+# Signal Keep is a separate dependency-free local study game.  Its CSS/JS
+# modules cannot intercept or access the tutor's Supabase/Anthropic endpoints.
+GAME_DIR = Path(__file__).with_name("game")
+
+
+@app.get("/game/", include_in_schema=False)
+async def game_index():
+    return FileResponse(
+        GAME_DIR / "index.html", media_type="text/html",
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
+app.mount("/game", StaticFiles(directory=GAME_DIR, html=True), name="signal-keep")

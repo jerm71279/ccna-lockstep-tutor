@@ -1,0 +1,3 @@
+registerScenarios({objective:'3.2',domain:3,entries:[
+{id:'B10',objective:'3.2',domain:3,topic:'IP routing',title:'Longest Match Wins',summary:'An incorrect specific /24 overrides the desired branch route.',lesson:"A router picks the longest matching prefix before considering a default. For 10.200.5.0/24, a /24 beats /8 and /0. Replace the wrong /24's ISP next hop with branch neighbor 10.200.0.2.",commands:['show ip route 10.200.5.0','ip route 10.200.5.0 255.255.255.0 10.200.0.2','traceroute'],fault:'The /24 to the branch LAN currently points toward ISP 192.0.2.1.',correct:'Replace the same /24 with the branch next hop 10.200.0.2.',mnemonics:['Most specific route wins','/24 beats /8 and /0','AD only compares equal-length paths']}
+]});

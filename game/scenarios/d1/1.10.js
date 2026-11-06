@@ -1,0 +1,3 @@
+registerScenarios({objective:'1.10',domain:1,entries:[
+{id:'I01',objective:'1.10',domain:1,topic:'IP connectivity',title:'No Exit Sign',summary:'Local ping works; remote traffic fails because no gateway is set.',lesson:"A host sends off-subnet packets to a default gateway in its own subnet. R1's 10.0.10.1 address is the correct next hop for PC-A at 10.0.10.21/24.",commands:['show ip interface brief','ping 10.0.10.1','PC gateway: 10.0.10.1'],fault:"The host's Default Gateway field is blank.",correct:"Set PC-A's default gateway to 10.0.10.1.",mnemonics:['Local = ARP direct','Remote = ARP for gateway','DNS is not routing']}
+]});

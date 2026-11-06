@@ -1,0 +1,3 @@
+registerScenarios({objective:'3.5',domain:3,entries:[
+{id:'F02',objective:'3.5',domain:3,topic:'FHRP',title:'A Virtual First Hop',summary:'Two physical gateways are present but no virtual gateway exists.',lesson:'HSRP routers share a virtual IP and MAC while retaining unique physical interface addresses. Hosts use the virtual 10.40.0.1; priorities decide the active gateway.',commands:['show standby brief','standby 40 ip 10.40.0.1','standby 40 priority 110 (preferred active)'],fault:'DSW1 .2 and DSW2 .3 have no HSRP; hosts use virtual .1.',correct:'Configure matching HSRP group 40 and virtual address .1 on both SVIs.',mnemonics:['Virtual IP for hosts','Physical IPs stay unique','Active + standby = resilience']}
+]});

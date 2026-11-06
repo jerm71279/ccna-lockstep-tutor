@@ -1,0 +1,3 @@
+registerScenarios({objective:'1.8',domain:1,entries:[
+{id:'Z01',objective:'1.8',domain:1,topic:'IPv6',title:'Mismatched Global Prefix',summary:'Link-local pings work but global addresses use different /64s.',lesson:'Global unicast neighbors on this shared Ethernet need a common prefix. R1 is 2001:DB8:12::1/64; R2 should be 2001:DB8:12::2/64 rather than the 13::/64 prefix.',commands:['show ipv6 interface brief','ipv6 address 2001:DB8:12::2/64','ping 2001:DB8:12::1'],fault:'R2 global address is 2001:DB8:13::2/64; design is 12::/64.',correct:"Change R2's global address to 2001:DB8:12::2/64.",mnemonics:['FE80 scope = local link','Global neighbors share prefix','DB8 = documentation']}
+]});

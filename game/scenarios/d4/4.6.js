@@ -1,0 +1,3 @@
+registerScenarios({objective:'4.6',domain:4,entries:[
+{id:'H01',objective:'4.6',domain:4,topic:'DHCP',title:'Relay Required',summary:'DHCP broadcasts need a relay to a central server.',lesson:'DHCPDISCOVER is local-link broadcast and will not cross a router. ip helper-address on the client-facing interface relays it to the central DHCP server with relay information.',commands:['show ip interface gi0/0/0','ip helper-address 10.100.20.10','show ip dhcp binding'],fault:'Gateway Gi0/0/0 has no helper address; server is 10.100.20.10.',correct:'Apply ip helper-address 10.100.20.10 to Gi0/0/0.',mnemonics:['Helper on client LAN','Server may be remote','Discover cannot hop itself']}
+]});

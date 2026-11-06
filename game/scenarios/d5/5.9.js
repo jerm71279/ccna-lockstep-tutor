@@ -1,0 +1,3 @@
+registerScenarios({objective:'5.9',domain:5,entries:[
+{id:'B06',objective:'5.9',domain:5,topic:'Wireless',title:'Legacy Security',summary:'The WLAN is WPA2 Personal but uses TKIP only.',lesson:'The stated WPA2-PSK design requires AES/CCMP. Replace legacy TKIP-only encryption on the controller WLAN; hiding an SSID or moving the gateway does not correct the security suite.',commands:['WLC: WLAN security settings','WPA2 Personal + AES/CCMP','Verify association and lease'],fault:'SSID FIELD-TECH is PSK with TKIP only; approved design is WPA2-AES.',correct:'Change encryption to AES/CCMP and remove TKIP-only selection.',mnemonics:['WPA2 + AES/CCMP','PSK = personal','802.1X = enterprise']}
+]});

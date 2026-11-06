@@ -1,0 +1,3 @@
+registerScenarios({objective:'4.8',domain:4,entries:[
+{id:'R01',objective:'4.8',domain:4,topic:'Device management',title:'SSH Excluded',summary:'VTY lines allow Telnet but not inbound SSH.',lesson:'transport input controls inbound management protocols on VTY lines. Permit only SSH to enforce secure management; no login local would weaken authentication, and password-encryption does not enable SSH.',commands:['show ip ssh','show running-config | section line vty','line vty 0 4 then transport input ssh'],fault:'SSH 2.0 is enabled globally, but VTY transport input is telnet.',correct:'Set the VTY lines to transport input ssh.',mnemonics:['input = connections into device','SSH needs domain + RSA + login','Choose ssh only for security']}
+]});

@@ -1,0 +1,3 @@
+registerScenarios({objective:'6.5',domain:6,entries:[
+{id:'B07',objective:'6.5',domain:6,topic:'Automation',title:'Ask for JSON',summary:'The REST client requests a response format the API will not return.',lesson:'Accept declares the desired response representation. Content-Type describes a supplied request body. Change Accept to application/json for the documented JSON GET; do not use DELETE to repair a read.',commands:['Accept: application/json','Content-Type describes request body','200 = successful read; 400 = bad request'],fault:'GET has Accept: application/xml; API returns 400 for the requested format.',correct:'Use header Accept: application/json.',mnemonics:['Accept = what you want back','Content-Type = what you send','CRUD: GET reads']}
+]});

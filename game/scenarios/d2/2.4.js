@@ -1,0 +1,3 @@
+registerScenarios({objective:'2.4',domain:2,entries:[
+{id:'L01',objective:'2.4',domain:2,topic:'EtherChannel',title:'Negotiation Gap',summary:'Static channel-group mode on cannot negotiate with LACP.',lesson:"LACP uses active/passive modes. A working pair is active-active or active-passive. PAgP uses desirable/auto. Match the SW2 members to SW1's LACP with active mode.",commands:['show etherchannel summary','interface range gi0/1 - 2','channel-group 1 mode active'],fault:'SW2 members use channel-group 1 mode on; SW1 uses LACP.',correct:'Set both SW2 members to channel-group 1 mode active.',mnemonics:['LACP active/passive','PAgP desirable/auto','on = no negotiation']}
+]});

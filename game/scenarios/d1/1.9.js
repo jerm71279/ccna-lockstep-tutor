@@ -1,0 +1,3 @@
+registerScenarios({objective:'1.9',domain:1,entries:[
+{id:'Z02',objective:'1.9',domain:1,topic:'IPv6',title:'Name the Zone',summary:'A link-local ping needs the outgoing interface context.',lesson:'Link-local addresses can be reused on different links. Supply the outgoing interface or zone identifier when pinging FE80::2; a DNS record, NAT64, or a new global address is unnecessary for this test.',commands:['show ipv6 interface gi0/0/0','ping ipv6 FE80::2 and specify Gi0/0/0','show ipv6 neighbors'],fault:'Ping to link-local FE80::1/2 is attempted without link scope.',correct:'Specify outgoing interface Gi0/0/0 for the link-local ping.',mnemonics:['Link-local needs link scope','FE80 = this link only','No router forwards link-local']}
+]});

@@ -1,0 +1,3 @@
+registerScenarios({objective:'4.5',domain:4,entries:[
+{id:'C04',objective:'4.5',domain:4,topic:'Syslog',title:'Too Much Information',summary:'The remote logging threshold is too noisy.',lesson:'Syslog severity 0 is most severe and 7 is debugging. logging trap warnings (4) sends levels 0–4 to the collector, excluding notifications (5), informational (6), and debugging (7).',commands:['show logging','logging host 10.140.0.20','logging trap warnings'],fault:'Remote logging is configured at informational instead of warnings.',correct:'Change logging trap to warnings.',mnemonics:['0 emergencies → 7 debugging','Lower number = more severe','Trap is remote threshold']}
+]});
